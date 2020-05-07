@@ -1,4 +1,4 @@
-package main;
+package engine;
 
 import javax.swing.*;
 import java.awt.event.ComponentAdapter;
@@ -15,7 +15,7 @@ public class Game extends JFrame implements WindowListener {
 
         addWindowListener(this);
 
-        panel = new GamePanel(1600, 900);
+        panel = new GamePanel(600, 900);
 
         panel.addComponentListener(new ComponentAdapter() {
             @Override

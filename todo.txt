@@ -1,0 +1,2 @@
+- Player interpolate between two points
+- Graph generation techniques

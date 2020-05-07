@@ -1,4 +1,6 @@
-package main;
+package engine;
+
+import blokus.Board;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +17,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     private final long targetTime = 1000 / 144; // denominator is FPS you want the game to run at
     private volatile boolean running;
 
-    private GameState state;
+    private final Board board;
 
     public GamePanel(int width, int height) {
         this.width = width;
@@ -23,7 +25,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
         setPreferredSize(new Dimension(width, height));
         requestFocus();
 
-        state = new GameState();
+        board = new Board();
     }
 
     @Override
@@ -66,11 +68,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, width, height);
 
-            // tick
-            state.tick();
-
-            // update
-            state.draw(g);
+            // draw board
+            board.draw(g, 0, 0, width, height);
 
             Toolkit.getDefaultToolkit().sync();
 
