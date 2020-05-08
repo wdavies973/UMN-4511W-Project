@@ -3,6 +3,7 @@ package blokus;
 import engine.View;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Grid extends View {
 
@@ -25,7 +26,7 @@ public class Grid extends View {
         void turnFinished();
     }
 
-    private Listener listener;
+    private final Listener listener;
 
     public Grid(Listener listener) {
         this.listener = listener;
@@ -119,6 +120,14 @@ public class Grid extends View {
         }
     }
 
+    public void move(Node node) {
+        node.piece.apply(false, node.flip, node.rotation);
+
+        node.piece.place(cells, node.cellX, node.cellY);
+
+        listener.turnFinished();
+    }
+
     public Point mouseToCell(int x, int y) {
         int cellWidthPX = getWidth() / WIDTH_CELLS;
         int cellHeightPX = getHeight() / HEIGHT_CELLS;
@@ -144,5 +153,13 @@ public class Grid extends View {
 
     public Piece getInHand() {
         return inHand;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent key) {
+        // reset the game
+        if(key.getKeyCode() == KeyEvent.VK_F12) {
+            cells = new Color[HEIGHT_CELLS][WIDTH_CELLS];
+        }
     }
 }

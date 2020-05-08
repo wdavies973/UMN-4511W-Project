@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
         if(thread == null) {
             thread = new Thread(this);
             requestFocus();
-            addMouseListener(this);;
+            addMouseListener(this);
             addMouseMotionListener(this);
             addKeyListener(this);
             thread.start();
@@ -106,7 +106,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        blokus.keyPressed(e);
     }
 
     @Override

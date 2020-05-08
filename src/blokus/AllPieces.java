@@ -178,7 +178,15 @@ public class AllPieces {
 
 
     public int[][] piece_type(int index) {
-        return piece_type[index];
+        int[][] copy = new int[5][5];
+
+        for(int row = 0; row < copy.length; row++) {
+            for(int col = 0; col < copy[row].length; col++) {
+                copy[row][col] = piece_type[index][row][col];
+            }
+        }
+
+        return copy;
     }
 }
 

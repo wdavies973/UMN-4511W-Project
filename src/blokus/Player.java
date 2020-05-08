@@ -1,11 +1,11 @@
 package blokus;
 
 import engine.View;
-import engine.ViewWatcher;
 import strategies.HumanStrategy;
 import strategies.Strategy;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class Player extends View {
@@ -23,25 +23,24 @@ public class Player extends View {
         void pieceSelected(Piece piece);
     }
 
-    private Listener listener;
+    private final Listener listener;
     private final ArrayList<Piece> pieces = new ArrayList<>();
     private final Style style;
 
-    private String name;
-    private Color color;
+    private final String name;
 
     private boolean isTurn;
 
-    private Strategy strategy;
+    private final Strategy strategy;
 
-    private Color turnHighlight = Color.green;
+    private final Color turnHighlight = Color.green;
 
-    final static float[] dash1 = {15.0f};
     private final BasicStroke basicStroke = new BasicStroke(5);
 
-    public Player(String name, Color color, Strategy strategy, Listener listener, Style style, boolean editable) {
+    private boolean outOfMoves;
+
+    public Player(String name, Color color, Strategy strategy, Listener listener, Style style) {
         this.name = name;
-        this.color = color;
         this.strategy = strategy;
 
         this.listener = listener;
@@ -76,8 +75,33 @@ public class Player extends View {
         return score;
     }
 
-    public void startTurn(Grid grid) {
-        strategy.turnStarted(grid, pieces);
+    public boolean startTurn(Grid grid) {
+        // Get all possible moves
+        ArrayList<Node> nodes = getAllPossibleMoves(grid.cells);
+
+        System.out.println("Found "+nodes.size()+" potential moves");
+
+        boolean canStart = nodes.size() > 0;
+
+        if(canStart) strategy.turnStarted(grid, nodes);
+
+        return canStart;
+    }
+
+    public boolean canPlay(Color[][] grid) {
+        return getAllPossibleMoves(grid).size() > 0;
+    }
+
+    public ArrayList<Node> getAllPossibleMoves(Color[][] grid) {
+        ArrayList<Node> moves = new ArrayList<>();
+
+        for(Piece piece : pieces) {
+            if(piece.isPlaced()) continue;
+
+            moves.addAll(piece.getPossibleMoves(grid));
+        }
+
+        return moves;
     }
 
     public void draw(Graphics2D g, int x, int y, int width, int height) {
@@ -144,7 +168,7 @@ public class Player extends View {
         }
 
         // Draw the score indicator
-        String label = name+" ("+getScore()+")";
+        String label = name+" ("+getScore()+")" + (outOfMoves ? " - NO MOVES LEFT" : "");
 
         g.setColor(Color.BLACK);
         if(style == Style.Left) {
@@ -212,5 +236,19 @@ public class Player extends View {
 
     public Strategy getStrategy() {
         return strategy;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent key) {
+        if(key.getKeyCode() == KeyEvent.VK_F12) {
+            for(Piece c : pieces) {
+                c.setPlaced(false);
+            }
+            outOfMoves = false;
+        }
+    }
+
+    public void setOutOfMoves(boolean outOfMoves) {
+        this.outOfMoves = outOfMoves;
     }
 }

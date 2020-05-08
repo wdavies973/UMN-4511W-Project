@@ -2,8 +2,11 @@ package blokus;
 
 import engine.View;
 import strategies.HumanStrategy;
+import strategies.RandomStrategy;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 // controls the overall game and state
@@ -12,14 +15,14 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     // draw 4 PieceBanks with grid in the center
     // piecebank will be roughly 20%? of width/height
 
-    private Grid grid = new Grid(this);
+    private final Grid grid = new Grid(this);
 
-    private Color betterGreen = new Color(0, 100, 0);
+    private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private Player top = new Player("John", Color.blue, new HumanStrategy(), this, Player.Style.Top, true);
-    private Player bottom = new Player("AI", Color.red, new HumanStrategy(), this, Player.Style.Bottom, true);
-    private Player left = new Player("AI", betterGreen, new HumanStrategy(),this,  Player.Style.Left, true);
-    private Player right = new Player("AI", Color.yellow, new HumanStrategy(),this, Player.Style.Right, true);
+    private final Player top = new Player("John", Color.blue, new RandomStrategy(), this, Player.Style.Top);
+    private final Player bottom = new Player("AI", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
+    private final Player left = new Player("AI", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
+    private final Player right = new Player("AI", Color.yellow, new HumanStrategy(),this, Player.Style.Right);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 
@@ -29,7 +32,7 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
         addChildren(grid, top, bottom, left, right);
 
         grid.addWatchers(players[0].getStrategy(), players[1].getStrategy(), players[2].getStrategy(), players[3].getStrategy());
-        grid.setDrawDots(Color.blue, Color.yellow, betterGreen, Color.red);
+        grid.setDrawDots(Color.blue, Color.yellow, BETTER_GREEN, Color.red);
 
         // bottom player starts
         bottom.setTurn(true);
@@ -39,6 +42,24 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
     @Override
     public void turnFinished() {
+        boolean any = false;
+
+        for(Player p : players) {
+            if(p.canPlay(grid.cells)) {
+                any = true;
+                break;
+            } else {
+                p.setOutOfMoves(true);
+            }
+        }
+
+        if(!any) {
+            // game over!
+            // TODO could stand some improvement
+            JOptionPane.showMessageDialog(null, "Game over!");
+            return;
+        }
+
         turn++;
         if(turn >= 4) {
             turn = 0;
@@ -51,7 +72,12 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
         grid.setInHand(null);
 
         players[turn].setTurn(true);
-        players[turn].startTurn(grid);
+
+        // skip a player if they can't make any moves
+        if(!players[turn].startTurn(grid)) {
+            turnFinished();
+            return;
+        }
 
         grid.setActiveWatcher(turn);
     }
@@ -90,5 +116,15 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     @Override
     public void pieceSelected(Piece piece) {
         grid.setInHand(piece);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent key) {
+        super.keyPressed(key);
+
+        if(key.getKeyCode() == KeyEvent.VK_F12) {
+            turn = -1;
+            turnFinished();
+        }
     }
 }

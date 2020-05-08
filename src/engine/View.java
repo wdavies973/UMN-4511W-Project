@@ -1,6 +1,7 @@
 package engine;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -103,6 +104,16 @@ public abstract class View {
 
         if(activeWatcher != -1) {
             watchers.get(activeWatcher).mouseMiddleClicked(x, y);
+        }
+    }
+
+    public void keyPressed(KeyEvent key) {
+        for(View v : children) {
+            v.keyPressed(key);
+        }
+
+        if(activeWatcher != -1) {
+            watchers.get(activeWatcher).keyPressed(key);
         }
     }
 
