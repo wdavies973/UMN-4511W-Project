@@ -1,10 +1,8 @@
 package blokus;
 
 import engine.View;
-import strategies.HumanStrategy;
 import strategies.RandomStrategy;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -19,14 +17,17 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private final Player top = new Player("John", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player bottom = new Player("AI", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
-    private final Player left = new Player("AI", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
-    private final Player right = new Player("AI", Color.yellow, new HumanStrategy(),this, Player.Style.Right);
+    private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
+    private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
+    private final Player left = new Player("Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
+    private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 
     private int turn = 0;
+
+    private String winner = "";
+    private boolean gameOver;
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
@@ -43,8 +44,17 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     @Override
     public void turnFinished() {
         boolean any = false;
+        int score = Integer.MAX_VALUE;
+        int winner = -1;
 
-        for(Player p : players) {
+        for(int i = 0; i < players.length; i++) {
+            Player p = players[i];
+
+            if(p.getScore() < score) {
+                score = p.getScore();
+                winner = i;
+            }
+
             if(p.canPlay(grid.cells)) {
                 any = true;
                 break;
@@ -55,8 +65,8 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
         if(!any) {
             // game over!
-            // TODO could stand some improvement
-            JOptionPane.showMessageDialog(null, "Game over!");
+            this.winner = players[winner].getName();
+            this.gameOver = true;
             return;
         }
 
@@ -86,6 +96,12 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         g.setColor(Color.lightGray);
         g.fillRect(x, y, width, height);
+
+        g.setColor(Color.black);
+        if(gameOver) {
+            g.drawString("GAME OVER - "+winner+" wins!", x + 15, y + height - 15);
+        }
+
     }
 
     @Override
@@ -124,6 +140,8 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
         if(key.getKeyCode() == KeyEvent.VK_F12) {
             turn = -1;
+            gameOver = false;
+            winner = "";
             turnFinished();
         }
     }

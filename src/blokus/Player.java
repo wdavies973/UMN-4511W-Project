@@ -251,4 +251,8 @@ public class Player extends View {
     public void setOutOfMoves(boolean outOfMoves) {
         this.outOfMoves = outOfMoves;
     }
+
+    public String getName() {
+        return name;
+    }
 }
