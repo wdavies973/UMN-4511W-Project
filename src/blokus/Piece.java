@@ -2,12 +2,15 @@ package blokus;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Piece {
 
     // a three by three grid, 1 where a block exists, 0 for none.
     // any shape should be representable with the correct values
     private int[][] shape = new int[5][5];
+
+    private final int[][] shapeCopy; // shape copy that won't get rotated
 
     private static final int GRID_PADDING = 1;
     private static final int BANK_PADDING = 4;
@@ -39,6 +42,15 @@ public class Piece {
                 if(Math.random() <= 0.5) {
                     shape[i][j] = 1;
                 }
+            }
+        }
+
+        // Copy the shape array
+        shapeCopy = new int[5][5];
+
+        for(int i = 0; i < shape.length; i++) {
+            for(int j = 0; j < shape[i].length; j++) {
+                shapeCopy[i][j] = shape[i][j];
             }
         }
     }
@@ -79,8 +91,6 @@ public class Piece {
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
     public boolean place(Color[][] grid, int cellX, int cellY) {
-        System.out.println("Placed at "+cellX+","+cellY);
-
         if(true) { // if you're about to return true, also set "placed" to true
             placed = true;
         }
@@ -142,7 +152,7 @@ public class Piece {
 
         for(int row = 0; row < 5; row++) {
             for(int col = 0; col < 5; col++) {
-                if(shape[row][col] == 1)
+                if(shapeCopy[row][col] == 1)
                     g.fillRect(drawX + col * cellWidth, drawY + row * cellHeight, cellWidth, cellHeight);
             }
         }
@@ -150,5 +160,9 @@ public class Piece {
 
     public void setPlaced(boolean placed) {
         this.placed = placed;
+    }
+
+    public boolean isPlaced() {
+        return placed;
     }
 }

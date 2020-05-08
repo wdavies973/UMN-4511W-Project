@@ -113,8 +113,8 @@ public class PieceBank extends View {
             index = pieceY + pieceX * 7;
         }
 
-        System.out.println("selected: "+pieceX+","+pieceY+": "+index);
-
-        listener.pieceSelected(pieces.get(index));
+        if(!pieces.get(index).isPlaced()) {
+            listener.pieceSelected(pieces.get(index));
+        }
     }
 }
