@@ -103,6 +103,10 @@ public class Grid extends View {
         this.drawDots = drawDots;
     }
 
+    public void setInHand(Piece inHand) {
+        this.inHand = inHand;
+    }
+
     @Override
     public void mouseMoved(int x, int y) {
         this.mouseX = x;

@@ -7,16 +7,22 @@ import java.util.ArrayList;
 
 public class PieceBank extends View {
 
+    public interface Listener {
+        void pieceSelected(Piece piece);
+    }
+
     public enum Style {
         Vertical,
         Horizontal
     }
 
+    private Listener listener;
     private final ArrayList<Piece> pieces = new ArrayList<>();
     private final Style style;
     private boolean editable;
 
-    public PieceBank(Color color, Style style, boolean editable) {
+    public PieceBank(Listener listener, Color color, Style style, boolean editable) {
+        this.listener = listener;
         this.style = style;
 
         for(int i = 0; i < 21; i++)
@@ -24,6 +30,7 @@ public class PieceBank extends View {
     }
 
     public void draw(Graphics2D g, int x, int y, int width, int height) {
+        // TODO this code is a bumbling pile of shit and needs to be reworked
         if(style == Style.Horizontal) {
             int pieceHeight = height / 3;
             int pieceWidth = (int)Math.ceil(width / 7.0);
@@ -69,4 +76,37 @@ public class PieceBank extends View {
         }
     }
 
+    @Override
+    public void mouseClicked(int x, int y) {
+        int pieceWidth, pieceHeight;
+
+        if(style == Style.Horizontal) {
+            pieceHeight = getHeight() / 3;
+            pieceWidth = (int)Math.ceil(getWidth() / 7.0);
+        } else {
+            pieceHeight = (int)Math.ceil(getHeight() / 7.0);
+            pieceWidth = getWidth() / 3;
+        }
+
+        // Figure out what cell was selected
+        // Translate the mouse screen position to a cell reference
+        int pieceX = x / pieceWidth;
+        int pieceY = y / pieceHeight;
+
+        // bound it to within the bounds of the map
+        pieceX = Math.min(pieceX, 7);
+        pieceX = Math.max(pieceX, 0);
+        pieceY = Math.min(pieceY, 2);
+        pieceY = Math.max(pieceY, 0);
+
+        int index;
+
+        if(style == Style.Horizontal) {
+            index = pieceX + pieceY * 7;
+        } else {
+            index = pieceY + pieceX * 7;
+        }
+
+        listener.pieceSelected(pieces.get(index));
+    }
 }
