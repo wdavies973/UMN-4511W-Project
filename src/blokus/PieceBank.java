@@ -19,4 +19,9 @@ public class PieceBank implements Component {
     public void draw(Graphics2D g, int x, int y, int width, int height) {
 
     }
+
+    @Override
+    public void mouseMoved(int x, int y) {
+
+    }
 }

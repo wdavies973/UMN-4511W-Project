@@ -15,4 +15,9 @@ public class Board implements Component {
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         grid.draw(g, x, y, width, height);
     }
+
+    @Override
+    public void mouseMoved(int x, int y) {
+        grid.mouseMoved(x, y);
+    }
 }

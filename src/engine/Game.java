@@ -15,7 +15,7 @@ public class Game extends JFrame implements WindowListener {
 
         addWindowListener(this);
 
-        panel = new GamePanel(600, 900);
+        panel = new GamePanel(600, 600);
 
         panel.addComponentListener(new ComponentAdapter() {
             @Override
