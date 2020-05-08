@@ -15,10 +15,10 @@ public class Blokus extends View implements PieceBank.Listener {
 
     private Color betterGreen = new Color(0, 100, 0);
 
-    private PieceBank top = new PieceBank(this, Color.blue, PieceBank.Style.Horizontal, true);
-    private PieceBank bottom = new PieceBank(this, Color.red, PieceBank.Style.Horizontal, true);
-    private PieceBank left = new PieceBank(this, betterGreen, PieceBank.Style.Vertical, true);
-    private PieceBank right = new PieceBank(this, Color.yellow, PieceBank.Style.Vertical, true);
+    private PieceBank top = new PieceBank(new Player("John", Color.blue), this, PieceBank.Style.Top, true);
+    private PieceBank bottom = new PieceBank(new Player("AI", Color.red), this, PieceBank.Style.Bottom, true);
+    private PieceBank left = new PieceBank(new Player("AI", betterGreen),this,  PieceBank.Style.Left, true);
+    private PieceBank right = new PieceBank(new Player("AI", Color.yellow),this, PieceBank.Style.Right, true);
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);

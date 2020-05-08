@@ -7,31 +7,49 @@ import java.util.ArrayList;
 
 public class PieceBank extends View {
 
+    private static final int TEXT_PADDING = 5;
+
     public interface Listener {
         void pieceSelected(Piece piece);
     }
 
     public enum Style {
-        Vertical,
-        Horizontal
+        Top,
+        Bottom,
+        Left,
+        Right
     }
 
     private Listener listener;
+    private Player player;
     private final ArrayList<Piece> pieces = new ArrayList<>();
     private final Style style;
     private boolean editable;
 
-    public PieceBank(Listener listener, Color color, Style style, boolean editable) {
+    public PieceBank(Player player, Listener listener, Style style, boolean editable) {
+        this.player = player;
         this.listener = listener;
         this.style = style;
 
         for(int i = 0; i < 21; i++)
-            pieces.add(new Piece(color, 0));
+            pieces.add(new Piece(player.getColor(), i));
+    }
+
+    public int getScore() {
+        int score = 0;
+
+        for(int i = 0; i < pieces.size(); i++) {
+            if(!pieces.get(i).isPlaced()) {
+                score += pieces.get(i).getSize();
+            }
+        }
+
+        return score;
     }
 
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         // TODO this code is a bumbling pile of shit and needs to be reworked
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;
             int pieceWidth = (int)Math.ceil(width / 7.0);
 
@@ -52,7 +70,7 @@ public class PieceBank extends View {
                 int row = i / 7;
                 p.drawInBank(g, x + (i % 7) * pieceWidth, y + row * pieceHeight, pieceWidth, pieceHeight);
             }
-        } else if(style == Style.Vertical) {
+        } else if(style == Style.Left || style == Style.Right) {
             int pieceHeight = (int)Math.ceil(height / 7.0);
             int pieceWidth = width / 3;
 
@@ -74,6 +92,24 @@ public class PieceBank extends View {
                 p.drawInBank(g, x + col * pieceWidth, y + (i % 7) * pieceHeight, pieceWidth, pieceHeight);
             }
         }
+
+        // Draw the score indicator
+        String label = player.getName()+" ("+getScore()+")";
+
+        g.setColor(Color.BLACK);
+        if(style == Style.Left) {
+            g.drawString(label, x, y - TEXT_PADDING);
+        } else if(style == Style.Right) {
+            int aiWidth = g.getFontMetrics().stringWidth(label);
+
+            g.drawString(label, x + width - aiWidth, y - TEXT_PADDING);
+        } else if(style == Style.Top) {
+            int aiWidth = g.getFontMetrics().stringWidth(label);
+
+            g.drawString(label, x - aiWidth - TEXT_PADDING, y + g.getFontMetrics().getHeight());
+        } else if(style == Style.Bottom) {
+            g.drawString(label, x + width + TEXT_PADDING * 2, y + height - TEXT_PADDING);
+        }
     }
 
     @Override
@@ -82,7 +118,7 @@ public class PieceBank extends View {
 
         int pieceWidth, pieceHeight;
 
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             pieceHeight = getHeight() / 3;
             pieceWidth = (int) Math.ceil(getWidth() / 7.0);
 
@@ -107,7 +143,7 @@ public class PieceBank extends View {
 
         int index;
 
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             index = pieceX + pieceY * 7;
         } else {
             index = pieceY + pieceX * 7;
