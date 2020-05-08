@@ -8,14 +8,14 @@ public class Piece {
 
     // a three by three grid, 1 where a block exists, 0 for none.
     // any shape should be representable with the correct values
-    private int[][] shape = new int[5][5];
+    private int[][] shape; //= new int[5][5];
 
-    private final int[][] shapeCopy; // shape copy that won't get rotated
+    private final int[][] shapeCopy = new int [5][5]; // shape copy that won't get rotated
 
     private static final int GRID_PADDING = 1;
     private static final int BANK_PADDING = 4;
 
-    Color color;
+    private Color color;
     private int kind;
 
     private boolean placed; // helper variable for piece bank
@@ -28,23 +28,9 @@ public class Piece {
         this.color = color;
         this.kind = kind;
 
-////          random
-        for(int i = 0; i < 5; i++) {
-            for(int j = 0; j < 5; j++) {
-                if(Math.random() <= 0.5) {
-                    shape[i][j] = 1;
-                }
-            }
-        }
+        AllPieces pieceInst = new AllPieces();
+        shape = pieceInst.piece_type(kind);
 
-        // Copy the shape array
-        shapeCopy = new int[5][5];
-
-        for(int i = 0; i < shape.length; i++) {
-            for(int j = 0; j < shape[i].length; j++) {
-                shapeCopy[i][j] = shape[i][j];
-            }
-        }
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
@@ -55,25 +41,178 @@ public class Piece {
 
     // perform a matrix rotate transform on the "shape" 2D array
     public void rotateClockwise() {
+        int[][] flipped = new int[5][5];
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[x][4-y] = shape[y][x];
+                //flipped[y][x] = shape[x][4 - y];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
 
     }
 
     // perform a matrix rotate transform on the "shape" 2D array
     public void rotateCounterClockwise() {
+        int[][] flipped = new int[5][5];
 
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[y][x] = shape[x][4 - y];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
     }
+
+    // flips the x-coordinates of the given piece
+    public void flip() {
+        int[][] flipped = new int[5][5];
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[y][4-x] = shape[y][x];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
+    }
+
+    // determines if the current piece is in a corner
+    public boolean isCorner (Color[][] grid, int cellX, int cellY) {
+        boolean cornered = false;
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                if (shape[y][x] == 1) {
+                    if ((cellX + x - 2) == 0 && (cellY + y - 2) == 0) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 19 && (cellY + y - 2) == 0) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 19 && (cellY + y - 2) == 19) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 0 && (cellY + y - 2) == 19) {
+                        cornered = true;
+                    }
+                }
+
+            }
+        }
+        return cornered;
+    }
+
 
     // returns whether the following placement of the piece is valid,
     // you'll need to access the grid.cells attribute to inspect cells,
     // the x,y coordinate will be the coordinate of the center of the shape array
     // overlayed with the map.
     public boolean isValid(Color[][] grid, int cellX, int cellY) {
-        return false;
+        boolean connects = false;
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                if (shape[y][x] == 1) {
+                    if ((cellX + x - 2) < 0 || (cellY + y - 2) < 0) { // outside of the borders of the board
+                        return false;
+                    }
+                    if ((cellX + x - 2) >= 20 || (cellY + y - 2) >= 20) { // outside of the borders of the board
+                        return false;
+                    }
+
+                    if (grid[cellY + y - 2][cellX + x - 2] != null) {   // laying on top of another piece
+                        return false;
+                    }
+
+                    // if there is a piece of the same color directly below return false
+                    if (cellY + y - 3 >= 0) {
+                        if (grid[cellY + y - 3][cellX + x - 2] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly to the left side return false
+                    if (cellX + x - 3 >= 0) {
+                        if (grid[cellY + y - 2][cellX + x - 3] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly above return false
+                    if (cellY + y - 1 < 20) {
+                        if (grid[cellY + y - 1][cellX + x - 2] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly to the right side return false
+                    if (cellX + x - 1 < 20) {
+                        if (grid[cellY + y - 2][cellX + x - 1] == color) {
+                            return false;
+                        }
+                    }
+
+                    // This section sees if the piece is diagonally attached to any other pieces
+                    if (!connects) {
+                        if (y < 4 || x < 4) {
+                            if (cellX + x - 1 < 20 && cellY + y - 1 < 20) { //lower right
+                                if (grid[cellY + y - 1][cellX + x - 1] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 3 >= 0 && cellY + y - 3 >= 0) { // upper left
+                                if (grid[cellY + y - 3][cellX + x - 3] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 1 < 20 && cellY + y - 3 >= 0) { //upper right
+                                if (grid[cellY + y - 3][cellX + x - 1] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 3 >= 0 && cellY + y - 1 < 20) { // lower left
+                                if (grid[cellY + y - 1][cellX + x - 3] == color) {
+                                    connects = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (isCorner(grid, cellX, cellY)) {
+            connects = true;
+        }
+        if (!connects) { // if not diagonally connected return false
+            return false;
+        }
+        return true;
     }
 
     // is there any valid location to put the piece? hint: use
     // isValid on every cell
     public boolean anyValid(Color[][] grid) {
+        for (int y = 0; y < 20; y++) {
+            for (int x = 0; x < 20; x++) {
+                if (isValid(grid, x, y)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -83,8 +222,19 @@ public class Piece {
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
     public boolean place(Color[][] grid, int cellX, int cellY) {
-        if(true) { // if you're about to return true, also set "placed" to true
-            placed = true;
+        if (!placed) {
+            System.out.println("Placed at " + cellX + "," + cellY);
+            if (isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
+                placed = true;
+
+                for (int y = 0; y < 5; y++) {
+                    for (int x = 0; x < 5; x++) {
+                        if (shape[y][x] == 1) {
+                            grid[cellY + y - 2][cellX + x - 2] = color;
+                        }
+                    }
+                }
+            }
         }
 
         return true;
