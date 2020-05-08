@@ -50,7 +50,7 @@ public class PieceBank extends View {
                 Piece p = pieces.get(i);
 
                 int row = i / 7;
-                p.drawFull(g, x + (i % 7) * pieceWidth, y + row * pieceHeight, pieceWidth, pieceHeight, false);
+                p.drawInBank(g, x + (i % 7) * pieceWidth, y + row * pieceHeight, pieceWidth, pieceHeight);
             }
         } else if(style == Style.Vertical) {
             int pieceHeight = (int)Math.ceil(height / 7.0);
@@ -71,7 +71,7 @@ public class PieceBank extends View {
                 Piece p = pieces.get(i);
 
                 int col = i / 7;
-                p.drawFull(g, x + col * pieceWidth, y + (i % 7) * pieceHeight, pieceWidth, pieceHeight, false);
+                p.drawInBank(g, x + col * pieceWidth, y + (i % 7) * pieceHeight, pieceWidth, pieceHeight);
             }
         }
     }

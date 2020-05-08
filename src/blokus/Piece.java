@@ -15,6 +15,8 @@ public class Piece {
     Color color;
     private int kind;
 
+    private boolean placed; // helper variable for piece bank
+
     // this should setup what kind of piece this should be, you should come up with some sort of a system
     // that will assign the values in "shape" correctly. So for example, there are 21 pieces, so I should be able
     // to create each one of them using an id, or whatever you think is easy. the id will map to a bunch of
@@ -77,7 +79,13 @@ public class Piece {
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
     public boolean place(Color[][] grid, int cellX, int cellY) {
-        return false;
+        System.out.println("Placed at "+cellX+","+cellY);
+
+        if(true) { // if you're about to return true, also set "placed" to true
+            placed = true;
+        }
+
+        return true;
     }
 
     // return the number of 1s in the "shape" array
@@ -117,8 +125,8 @@ public class Piece {
         }
     }
 
-    public void drawFull(Graphics2D g, int drawX, int drawY, int width, int height, boolean locked) {
-        if(!locked) {
+    public void drawInBank(Graphics2D g, int drawX, int drawY, int width, int height) {
+        if(!placed) {
             g.setColor(color);
         } else {
             g.setColor(Color.darkGray);
@@ -140,4 +148,7 @@ public class Piece {
         }
     }
 
+    public void setPlaced(boolean placed) {
+        this.placed = placed;
+    }
 }
