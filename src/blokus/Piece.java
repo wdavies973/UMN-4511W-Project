@@ -9,7 +9,8 @@ public class Piece {
     // any shape should be representable with the correct values
     private int[][] shape = new int[5][5];
 
-    private static final int PADDING = 1;
+    private static final int GRID_PADDING = 1;
+    private static final int BANK_PADDING = 4;
 
     Color color;
     private int kind;
@@ -31,16 +32,17 @@ public class Piece {
                 {0, 0, 0, 0, 0},
         };
 //          random
-//        for(int i = 0; i < 5; i++) {
-//            for(int j = 0; j < 5; j++) {
-//                if(Math.random() <= 0.5) {
-//                    shape[i][j] = 1;
-//                }
-//            }
-//        }
+        for(int i = 0; i < 5; i++) {
+            for(int j = 0; j < 5; j++) {
+                if(Math.random() <= 0.5) {
+                    shape[i][j] = 1;
+                }
+            }
+        }
     }
 
-    // returns an arraylist containing every possible piece kind, just a convenience method
+    // returns an arraylist containing every possible piece kind, just a convenience method,
+    // return them from largest to smallest size
     public static ArrayList<Piece> CREATE_ALL_PIECES(Color color) {
         return new ArrayList<>();
     }
@@ -73,8 +75,9 @@ public class Piece {
     // at this location (i.e. shape[1][1] should correspond to x,y). Use the color
     // attribute of this class to set the grid position. This method should check
     // if the position is valid and if not should do nothing
-    public void place(Color[][] grid, int x, int y) {
-
+    // returns whether a piece was actually placed or not
+    public boolean place(Color[][] grid, int x, int y) {
+        return false;
     }
 
     // return the number of 1s in the "shape" array
@@ -103,7 +106,7 @@ public class Piece {
 
         for(int row = y1; row <= y2; row++) {
             for(int col = x1; col <= x2; col++) {
-                Rectangle rect = new Rectangle(drawX + col * width + PADDING, drawY + row * height + PADDING, width - PADDING, height - PADDING);
+                Rectangle rect = new Rectangle(drawX + col * width + GRID_PADDING, drawY + row * height + GRID_PADDING, width - GRID_PADDING, height - GRID_PADDING);
 
                 if(shape[row - (cellY - 2)][col - (cellX - 2)] == 1) {
                     g.fillRect(rect.x, rect.y, rect.width, rect.height);
@@ -118,6 +121,11 @@ public class Piece {
         } else {
             g.setColor(Color.darkGray);
         }
+
+        drawX = drawX + BANK_PADDING / 2;
+        drawY = drawY + BANK_PADDING / 2;
+        width = width - BANK_PADDING;
+        height = height - BANK_PADDING;
 
         int cellWidth = width / 5;
         int cellHeight = height / 5;

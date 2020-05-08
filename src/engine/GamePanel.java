@@ -1,6 +1,6 @@
 package engine;
 
-import blokus.Board;
+import blokus.Blokus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,10 +14,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     private Thread thread;
     private Graphics2D g;
     private BufferedImage image; // the image the game's graphics are drawn to
-    private final long targetTime = 1000 / 144; // denominator is FPS you want the game to run at
+    private static final long TARGET_TIME = 1000 / 144; // denominator is FPS you want the game to run at
     private volatile boolean running;
 
-    private final Board board;
+    private final Blokus blokus;
 
     public GamePanel(int width, int height) {
         this.width = width;
@@ -25,7 +25,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
         setPreferredSize(new Dimension(width, height));
         requestFocus();
 
-        board = new Board();
+        blokus = new Blokus();
+        blokus.layout(0, 0, width, height);
     }
 
     @Override
@@ -45,6 +46,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         g = (Graphics2D) image.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         running = true;
     }
@@ -52,6 +54,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void notifyResize(int width, int height) {
         this.width = width;
         this.height = height;
+
+        blokus.layout(0, 0, width, height);
         init();
     }
 
@@ -69,7 +73,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             g.fillRect(0, 0, width, height);
 
             // draw board
-            board.draw(g, 0, 0, width, height);
+            blokus.draw(g);
 
             Toolkit.getDefaultToolkit().sync();
 
@@ -79,7 +83,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             screen.dispose();
 
             elapsed = System.nanoTime() - start;
-            wait = targetTime - elapsed / 1000000;
+            wait = TARGET_TIME - elapsed / 1000000;
             if(wait < 0) wait = 0;
             try {
                 //noinspection BusyWait
@@ -118,9 +122,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override
     public void mousePressed(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
-            board.mouseClicked(e.getX(), e.getY());
+            blokus.mouseClicked(e.getX(), e.getY());
         } else if(e.getButton() == MouseEvent.BUTTON3) {
-            board.mouseRightClicked(e.getX(), e.getY());
+            blokus.mouseRightClicked(e.getX(), e.getY());
         }
     }
 
@@ -146,6 +150,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        board.mouseMoved(e.getX(), e.getY());
+        blokus.mouseMoved(e.getX(), e.getY());
     }
 }

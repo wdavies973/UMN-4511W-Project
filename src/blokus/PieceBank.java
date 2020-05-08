@@ -1,11 +1,11 @@
 package blokus;
 
-import engine.Component;
+import engine.View;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class PieceBank implements Component {
+public class PieceBank extends View {
 
     public enum Style {
         Vertical,
@@ -23,7 +23,6 @@ public class PieceBank implements Component {
             pieces.add(new Piece(color, 0));
     }
 
-    @Override
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         if(style == Style.Horizontal) {
             int pieceHeight = height / 3;
@@ -70,18 +69,4 @@ public class PieceBank implements Component {
         }
     }
 
-    @Override
-    public void mouseMoved(int x, int y) {
-
-    }
-
-    @Override
-    public void mouseRightClicked(int x, int y) {
-
-    }
-
-    @Override
-    public void mouseClicked(int x, int y) {
-
-    }
 }
