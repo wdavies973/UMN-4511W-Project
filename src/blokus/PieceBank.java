@@ -26,7 +26,7 @@ public class PieceBank extends View {
         this.style = style;
 
         for(int i = 0; i < 21; i++)
-            pieces.add(new Piece(color, 0));
+            pieces.add(new Piece(color, i));
     }
 
     public void draw(Graphics2D g, int x, int y, int width, int height) {

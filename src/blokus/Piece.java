@@ -7,12 +7,12 @@ public class Piece {
 
     // a three by three grid, 1 where a block exists, 0 for none.
     // any shape should be representable with the correct values
-    private int[][] shape = new int[5][5];
+    private int[][] shape; //= new int[5][5];
 
     private static final int GRID_PADDING = 1;
     private static final int BANK_PADDING = 4;
 
-    Color color;
+    private Color color;
     private int kind;
 
     private boolean placed; // helper variable for piece bank
@@ -24,23 +24,8 @@ public class Piece {
     public Piece(Color color, int kind) {
         this.color = color;
         this.kind = kind;
-
-        // the cross shape
-        shape = new int[][]{
-                {0, 0, 0, 0, 0},
-                {0, 0, 1, 0, 0},
-                {0, 1, 1, 1, 0},
-                {0, 0, 1, 0, 0},
-                {0, 0, 0, 0, 0},
-        };
-////          random
-        for(int i = 0; i < 5; i++) {
-            for(int j = 0; j < 5; j++) {
-                if(Math.random() <= 0.5) {
-                    shape[i][j] = 1;
-                }
-            }
-        }
+        AllPieces pieceInst = new AllPieces();
+        shape = pieceInst.piece_type(kind);
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
@@ -51,12 +36,55 @@ public class Piece {
 
     // perform a matrix rotate transform on the "shape" 2D array
     public void rotateClockwise() {
+        int[][] flipped = new int[5][5];
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[x][4-y] = shape[y][x];
+                //flipped[y][x] = shape[x][4 - y];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
 
     }
 
     // perform a matrix rotate transform on the "shape" 2D array
     public void rotateCounterClockwise() {
+        int[][] flipped = new int[5][5];
 
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[y][x] = shape[x][4 - y];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
+    }
+
+    // flips the x-coordinates of the given piece
+    public void flip() {
+        int[][] flipped = new int[5][5];
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                flipped[y][4-x] = shape[y][x];
+            }
+        }
+
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                shape[y][x] = flipped[y][x];
+            }
+        }
     }
 
     // returns whether the following placement of the piece is valid,
@@ -64,12 +92,63 @@ public class Piece {
     // the x,y coordinate will be the coordinate of the center of the shape array
     // overlayed with the map.
     public boolean isValid(Color[][] grid, int cellX, int cellY) {
-        return false;
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                if (shape[y][x] == 1) {
+                    if ((cellX + x - 2) < 0 || (cellY + y - 2) < 0) { // outside of the borders of the board
+                        return false;
+                    }
+                    if ((cellX + x - 2) >= 20 || (cellY + y - 2) >= 20) { // outside of the borders of the board
+                        return false;
+                    }
+
+                    if (grid[cellY + y - 2][cellX + x - 2] != null) {   // laying on top of another piece
+                        return false;
+                    }
+
+                    // if there is a piece of the same color directly below return false
+                    if (cellY + y - 3 >= 0) {
+                        if (grid[cellY + y - 3][cellX + x - 2] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly to the left side return false
+                    if (cellX + x - 3 >= 0) {
+                        if (grid[cellY + y - 2][cellX + x - 3] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly above return false
+                    if (cellY + y - 1 < 20) {
+                        if (grid[cellY + y - 1][cellX + x - 2] == color) {
+                            return false;
+                        }
+                    }
+
+                    // if there is a piece of the same color directly to the right side return false
+                    if (cellX + x - 1 < 20) {
+                        if (grid[cellY + y - 2][cellX + x - 1] == color) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     // is there any valid location to put the piece? hint: use
     // isValid on every cell
     public boolean anyValid(Color[][] grid) {
+        for (int y = 0; y < 20; y++) {
+            for (int x = 0; x < 20; x++) {
+                if (isValid(grid, x, y)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -79,10 +158,19 @@ public class Piece {
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
     public boolean place(Color[][] grid, int cellX, int cellY) {
-        System.out.println("Placed at "+cellX+","+cellY);
+        if (!placed) {
+            System.out.println("Placed at " + cellX + "," + cellY);
+            if (isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
+                placed = true;
 
-        if(true) { // if you're about to return true, also set "placed" to true
-            placed = true;
+                for (int y = 0; y < 5; y++) {
+                    for (int x = 0; x < 5; x++) {
+                        if (shape[y][x] == 1) {
+                            grid[cellY + y - 2][cellX + x - 2] = color;
+                        }
+                    }
+                }
+            }
         }
 
         return true;

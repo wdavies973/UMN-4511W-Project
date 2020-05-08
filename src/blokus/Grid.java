@@ -139,4 +139,5 @@ public class Grid extends View {
             inHand.place(cells, cellX, cellY);
         }
     }
+
 }
