@@ -157,6 +157,8 @@ public class Grid extends View {
 
     @Override
     public void keyPressed(KeyEvent key) {
+        super.keyPressed(key);
+
         // reset the game
         if(key.getKeyCode() == KeyEvent.VK_F12) {
             cells = new Color[HEIGHT_CELLS][WIDTH_CELLS];

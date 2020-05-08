@@ -14,31 +14,27 @@ public class HumanStrategy implements Strategy {
     @Override
     public void turnStarted(Grid grid, ArrayList<Node> moves) {
         this.grid = grid;
-
-        for(Node move : moves) {
-            System.out.println("Move: piece " + move.piece.getKind() + " at (" + move.cellX + "," + move.cellY + ") with rotation " + move.rotation + " and flip " + (move.flip));
-        }
     }
 
     @Override
     public void mouseClicked(int x, int y) {
         Point cell = grid.mouseToCell(x, y);
 
-        if(grid.getInHand() != null) {
+        if(grid != null && grid.getInHand() != null) {
             grid.move(grid.getInHand(), cell.x, cell.y);
         }
     }
 
     @Override
     public void mouseRightClicked(int x, int y) {
-        if(grid.getInHand() != null) {
+        if(grid != null && grid.getInHand() != null) {
             grid.getInHand().rotateClockwise();
         }
     }
 
     @Override
     public void mouseMiddleClicked(int x, int y) {
-        if(grid.getInHand() != null) {
+        if(grid != null && grid.getInHand() != null) {
             grid.getInHand().flip();
         }
     }
@@ -46,7 +42,7 @@ public class HumanStrategy implements Strategy {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_R) {
-            if(grid.getInHand() != null) {
+            if(grid != null && grid.getInHand() != null) {
                 grid.getInHand().reset();
             }
         }

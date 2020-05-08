@@ -1,6 +1,7 @@
 package blokus;
 
 import engine.View;
+import strategies.HumanStrategy;
 import strategies.RandomStrategy;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
     private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
     private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
-    private final Player left = new Player("Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
+    private final Player left = new Player("Player 3", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
     private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
@@ -37,8 +38,8 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
 
         // bottom player starts
         bottom.setTurn(true);
-        bottom.startTurn(grid);
         grid.setActiveWatcher(0);
+        bottom.startTurn(grid);
     }
 
     @Override
