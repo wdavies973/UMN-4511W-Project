@@ -78,25 +78,31 @@ public class PieceBank extends View {
 
     @Override
     public void mouseClicked(int x, int y) {
+        int pieceX, pieceY;
+
         int pieceWidth, pieceHeight;
 
         if(style == Style.Horizontal) {
             pieceHeight = getHeight() / 3;
-            pieceWidth = (int)Math.ceil(getWidth() / 7.0);
+            pieceWidth = (int) Math.ceil(getWidth() / 7.0);
+
+            pieceX = x / pieceWidth;
+            pieceY = y / pieceHeight;
+
+            pieceX = Math.min(pieceX, 6);
+            pieceX = Math.max(pieceX, 0);
+            pieceY = Math.min(pieceY, 2);
         } else {
-            pieceHeight = (int)Math.ceil(getHeight() / 7.0);
+            pieceHeight = (int) Math.ceil(getHeight() / 7.0);
             pieceWidth = getWidth() / 3;
+
+            pieceX = x / pieceWidth;
+            pieceY = y / pieceHeight;
+
+            pieceX = Math.min(pieceX, 2);
+            pieceX = Math.max(pieceX, 0);
+            pieceY = Math.min(pieceY, 6);
         }
-
-        // Figure out what cell was selected
-        // Translate the mouse screen position to a cell reference
-        int pieceX = x / pieceWidth;
-        int pieceY = y / pieceHeight;
-
-        // bound it to within the bounds of the map
-        pieceX = Math.min(pieceX, 7);
-        pieceX = Math.max(pieceX, 0);
-        pieceY = Math.min(pieceY, 2);
         pieceY = Math.max(pieceY, 0);
 
         int index;
@@ -106,6 +112,8 @@ public class PieceBank extends View {
         } else {
             index = pieceY + pieceX * 7;
         }
+
+        System.out.println("selected: "+pieceX+","+pieceY+": "+index);
 
         listener.pieceSelected(pieces.get(index));
     }

@@ -32,13 +32,13 @@ public class Piece {
                 {0, 0, 0, 0, 0},
         };
 ////          random
-//        for(int i = 0; i < 5; i++) {
-//            for(int j = 0; j < 5; j++) {
-//                if(Math.random() <= 0.5) {
-//                    shape[i][j] = 1;
-//                }
-//            }
-//        }
+        for(int i = 0; i < 5; i++) {
+            for(int j = 0; j < 5; j++) {
+                if(Math.random() <= 0.5) {
+                    shape[i][j] = 1;
+                }
+            }
+        }
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
