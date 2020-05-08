@@ -7,12 +7,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 // controls the overall game and state
-public class Blokus extends View implements Player.Listener {
+public class Blokus extends View implements Player.Listener, Grid.Listener {
 
     // draw 4 PieceBanks with grid in the center
     // piecebank will be roughly 20%? of width/height
 
-    private Grid grid = new Grid();
+    private Grid grid = new Grid(this);
 
     private Color betterGreen = new Color(0, 100, 0);
 
@@ -21,12 +21,39 @@ public class Blokus extends View implements Player.Listener {
     private Player left = new Player("AI", betterGreen, new HumanStrategy(),this,  Player.Style.Left, true);
     private Player right = new Player("AI", Color.yellow, new HumanStrategy(),this, Player.Style.Right, true);
 
+    private final Player[] players = new Player[]{bottom, right, top, left};
+
     private int turn = 0;
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
 
+        grid.addWatchers(players[0].getStrategy(), players[1].getStrategy(), players[2].getStrategy(), players[3].getStrategy());
         grid.setDrawDots(Color.blue, Color.yellow, betterGreen, Color.red);
+
+        // bottom player starts
+        bottom.setTurn(true);
+        bottom.startTurn(grid);
+        grid.setActiveWatcher(0);
+    }
+
+    @Override
+    public void turnFinished() {
+        turn++;
+        if(turn >= 4) {
+            turn = 0;
+        }
+
+        for(Player p : players) {
+            p.setTurn(false);
+        }
+
+        grid.setInHand(null);
+
+        players[turn].setTurn(true);
+        players[turn].startTurn(grid);
+
+        grid.setActiveWatcher(turn);
     }
 
     @Override

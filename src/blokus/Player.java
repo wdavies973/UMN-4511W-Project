@@ -1,6 +1,8 @@
 package blokus;
 
 import engine.View;
+import engine.ViewWatcher;
+import strategies.HumanStrategy;
 import strategies.Strategy;
 
 import java.awt.*;
@@ -21,7 +23,6 @@ public class Player extends View {
         void pieceSelected(Piece piece);
     }
 
-
     private Listener listener;
     private final ArrayList<Piece> pieces = new ArrayList<>();
     private final Style style;
@@ -31,23 +32,36 @@ public class Player extends View {
 
     private boolean isTurn;
 
+    private Strategy strategy;
+
     private Color turnHighlight = Color.green;
 
     final static float[] dash1 = {15.0f};
-    private final BasicStroke basicStroke = new BasicStroke(5,
-            BasicStroke.CAP_BUTT,
-            BasicStroke.JOIN_MITER,
-            10.0f, dash1, 0.0f);
+    private final BasicStroke basicStroke = new BasicStroke(5);
 
     public Player(String name, Color color, Strategy strategy, Listener listener, Style style, boolean editable) {
         this.name = name;
         this.color = color;
+        this.strategy = strategy;
 
         this.listener = listener;
         this.style = style;
 
+        int cornerX, cornerY;
+        if(style == Style.Bottom) {
+            cornerX = cornerY = 19;
+        } else if(style == Style.Right) {
+            cornerX = 19;
+            cornerY = 0;
+        } else if(style == Style.Top) {
+            cornerX = cornerY = 0;
+        } else {
+            cornerX = 0;
+            cornerY = 19;
+        }
+
         for(int i = 0; i < 21; i++)
-            pieces.add(new Piece(color, i));
+            pieces.add(new Piece(cornerX, cornerY, color, i));
     }
 
     public int getScore() {
@@ -62,8 +76,11 @@ public class Player extends View {
         return score;
     }
 
+    public void startTurn(Grid grid) {
+        strategy.turnStarted(grid, pieces);
+    }
+
     public void draw(Graphics2D g, int x, int y, int width, int height) {
-        // TODO this code is a bumbling pile of shit and needs to be reworked
         if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;
             int pieceWidth = (int)Math.ceil(width / 7.0);
@@ -147,6 +164,8 @@ public class Player extends View {
 
     @Override
     public void mouseClicked(int x, int y) {
+        if(!(strategy instanceof HumanStrategy) || !isTurn) return;
+
         int pieceX, pieceY;
 
         int pieceWidth, pieceHeight;
@@ -185,5 +204,13 @@ public class Player extends View {
         if(!pieces.get(index).isPlaced()) {
             listener.pieceSelected(pieces.get(index));
         }
+    }
+
+    public void setTurn(boolean turn) {
+        isTurn = turn;
+    }
+
+    public Strategy getStrategy() {
+        return strategy;
     }
 }

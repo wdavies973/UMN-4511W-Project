@@ -14,15 +14,21 @@ public class Grid extends View {
     // cell
     public Color[][] cells = new Color[HEIGHT_CELLS][WIDTH_CELLS];
 
-    private Piece inHand = new Piece(Color.blue, 0);
+    private Piece inHand;
 
     private int mouseX, mouseY;
 
     private boolean drawDots;
     private Color dotTopLeft, dotTopRight, dotBottomLeft, dotBottomRight;
 
-    public Grid() {
+    public interface Listener {
+        void turnFinished();
+    }
 
+    private Listener listener;
+
+    public Grid(Listener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -103,12 +109,31 @@ public class Grid extends View {
         this.drawDots = true;
     }
 
-    public void setDrawDots(boolean drawDots) {
-        this.drawDots = drawDots;
-    }
-
     public void setInHand(Piece inHand) {
         this.inHand = inHand;
+    }
+
+    public void move(Piece piece, int cellX, int cellY) {
+        if(piece.place(cells, cellX, cellY)) {
+            listener.turnFinished();
+        }
+    }
+
+    public Point mouseToCell(int x, int y) {
+        int cellWidthPX = getWidth() / WIDTH_CELLS;
+        int cellHeightPX = getHeight() / HEIGHT_CELLS;
+
+        // Translate the mouse screen position to a cell reference
+        int cellX = x / cellWidthPX;
+        int cellY = y / cellHeightPX;
+
+        // bound it to within the bounds of the map
+        cellX = Math.min(cellX, WIDTH_CELLS - 1);
+        cellX = Math.max(cellX, 0);
+        cellY = Math.min(cellY, HEIGHT_CELLS - 1);
+        cellY = Math.max(cellY, 0);
+
+        return new Point(cellX, cellY);
     }
 
     @Override
@@ -117,33 +142,7 @@ public class Grid extends View {
         this.mouseY = y;
     }
 
-    @Override
-    public void mouseRightClicked(int x, int y) {
-        if(inHand != null) {
-            inHand.rotateClockwise();
-        }
+    public Piece getInHand() {
+        return inHand;
     }
-
-    @Override
-    public void mouseClicked(int x, int y) {
-        if(inHand != null) {
-            int cellWidthPX = getWidth() / WIDTH_CELLS;
-            int cellHeightPX = getHeight() / HEIGHT_CELLS;
-
-            // Translate the mouse screen position to a cell reference
-            int cellX = mouseX / cellWidthPX;
-            int cellY = mouseY / cellHeightPX;
-
-            // bound it to within the bounds of the map
-            cellX = Math.min(cellX, WIDTH_CELLS - 1);
-            cellX = Math.max(cellX, 0);
-            cellY = Math.min(cellY, HEIGHT_CELLS - 1);
-            cellY = Math.max(cellY, 0);
-
-            if(inHand.place(cells, cellX, cellY)) {
-               inHand = null;
-            }
-        }
-    }
-
 }

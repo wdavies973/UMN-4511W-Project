@@ -2,29 +2,33 @@ package blokus;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Piece {
 
     // a three by three grid, 1 where a block exists, 0 for none.
     // any shape should be representable with the correct values
-    private int[][] shape; //= new int[5][5];
+    private final int[][] shape; //= new int[5][5];
 
     private final int[][] shapeCopy = new int [5][5]; // shape copy that won't get rotated
 
     private static final int GRID_PADDING = 1;
     private static final int BANK_PADDING = 4;
 
-    private Color color;
-    private int kind;
+    private final Color color;
+    private final int kind;
 
     private boolean placed; // helper variable for piece bank
+
+    // the corner the piece must start at
+    private int cornerX, cornerY;
 
     // this should setup what kind of piece this should be, you should come up with some sort of a system
     // that will assign the values in "shape" correctly. So for example, there are 21 pieces, so I should be able
     // to create each one of them using an id, or whatever you think is easy. the id will map to a bunch of
     // pre specified arrays for every piece in the game, and these arrays will be copied into "shape"
-    public Piece(Color color, int kind) {
+    public Piece(int cornerX, int cornerY, Color color, int kind) {
+        this.cornerX = cornerX;
+        this.cornerY = cornerY;
         this.color = color;
         this.kind = kind;
 
@@ -60,7 +64,6 @@ public class Piece {
                 shape[y][x] = flipped[y][x];
             }
         }
-
     }
 
     // perform a matrix rotate transform on the "shape" 2D array
@@ -226,9 +229,8 @@ public class Piece {
     // attribute of this class to set the grid position. This method should check
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
-    public boolean place(Color[][] grid, int cellX, int cellY) {
+    boolean place(Color[][] grid, int cellX, int cellY) {
         if (!placed) {
-            System.out.println("Placed at " + cellX + "," + cellY);
             if (isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
                 placed = true;
 
@@ -247,7 +249,15 @@ public class Piece {
 
     // return the number of 1s in the "shape" array
     public int getSize() {
-        return 0;
+        int size = 0;
+
+        for(int[] ints : shape) {
+            for(int col = 0; col < shape.length; col++) {
+                size += ints[col];
+            }
+        }
+
+        return size;
     }
 
     // kind is used as an ID of sorts and needs to be accessed by other parts

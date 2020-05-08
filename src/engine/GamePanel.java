@@ -125,6 +125,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             blokus.mouseClicked(e.getX(), e.getY());
         } else if(e.getButton() == MouseEvent.BUTTON3) {
             blokus.mouseRightClicked(e.getX(), e.getY());
+        } else if(e.getButton() == MouseEvent.BUTTON2) {
+            blokus.mouseMiddleClicked(e.getX(), e.getY());
         }
     }
 
