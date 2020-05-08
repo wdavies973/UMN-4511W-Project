@@ -31,14 +31,14 @@ public class Piece {
                 {0, 0, 1, 0, 0},
                 {0, 0, 0, 0, 0},
         };
-//          random
-        for(int i = 0; i < 5; i++) {
-            for(int j = 0; j < 5; j++) {
-                if(Math.random() <= 0.5) {
-                    shape[i][j] = 1;
-                }
-            }
-        }
+////          random
+//        for(int i = 0; i < 5; i++) {
+//            for(int j = 0; j < 5; j++) {
+//                if(Math.random() <= 0.5) {
+//                    shape[i][j] = 1;
+//                }
+//            }
+//        }
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
@@ -61,8 +61,8 @@ public class Piece {
     // you'll need to access the grid.cells attribute to inspect cells,
     // the x,y coordinate will be the coordinate of the center of the shape array
     // overlayed with the map.
-    public boolean isValid(Color[][] grid, int x, int y) {
-        return x % 2 == 0;
+    public boolean isValid(Color[][] grid, int cellX, int cellY) {
+        return false;
     }
 
     // is there any valid location to put the piece? hint: use
@@ -76,7 +76,7 @@ public class Piece {
     // attribute of this class to set the grid position. This method should check
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
-    public boolean place(Color[][] grid, int x, int y) {
+    public boolean place(Color[][] grid, int cellX, int cellY) {
         return false;
     }
 
@@ -90,6 +90,8 @@ public class Piece {
     public int getKind() {
         return kind;
     }
+
+    // ignore below here
 
     // cellX, cellY is center of the shape
     public void drawHover(Color[][] grid, Graphics2D g, int cellX, int cellY, int drawX, int drawY, int width, int height) {

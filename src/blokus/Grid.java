@@ -123,7 +123,20 @@ public class Grid extends View {
     @Override
     public void mouseClicked(int x, int y) {
         if(inHand != null) {
-            inHand.place(cells, x, y);
+            int cellWidthPX = getWidth() / WIDTH_CELLS;
+            int cellHeightPX = getHeight() / HEIGHT_CELLS;
+
+            // Translate the mouse screen position to a cell reference
+            int cellX = mouseX / cellWidthPX;
+            int cellY = mouseY / cellHeightPX;
+
+            // bound it to within the bounds of the map
+            cellX = Math.min(cellX, WIDTH_CELLS - 1);
+            cellX = Math.max(cellX, 0);
+            cellY = Math.min(cellY, HEIGHT_CELLS - 1);
+            cellY = Math.max(cellY, 0);
+
+            inHand.place(cells, cellX, cellY);
         }
     }
 }
