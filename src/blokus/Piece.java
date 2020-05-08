@@ -87,11 +87,38 @@ public class Piece {
         }
     }
 
+    // determines if the current piece is in a corner
+    public boolean isCorner (Color[][] grid, int cellX, int cellY) {
+        boolean cornered = false;
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                if (shape[y][x] == 1) {
+                    if ((cellX + x - 2) == 0 && (cellY + y - 2) == 0) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 19 && (cellY + y - 2) == 0) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 19 && (cellY + y - 2) == 19) {
+                        cornered = true;
+                    }
+                    if ((cellX + x - 2) == 0 && (cellY + y - 2) == 19) {
+                        cornered = true;
+                    }
+                }
+
+            }
+        }
+        return cornered;
+    }
+
+
     // returns whether the following placement of the piece is valid,
     // you'll need to access the grid.cells attribute to inspect cells,
     // the x,y coordinate will be the coordinate of the center of the shape array
     // overlayed with the map.
     public boolean isValid(Color[][] grid, int cellX, int cellY) {
+        boolean connects = false;
         for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 5; x++) {
                 if (shape[y][x] == 1) {
@@ -133,8 +160,40 @@ public class Piece {
                             return false;
                         }
                     }
+
+                    // This section sees if the piece is diagonally attached to any other pieces
+                    if (!connects) {
+                        if (y < 4 || x < 4) {
+                            if (cellX + x - 1 < 20 && cellY + y - 1 < 20) { //lower right
+                                if (grid[cellY + y - 1][cellX + x - 1] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 3 >= 0 && cellY + y - 3 >= 0) { // upper left
+                                if (grid[cellY + y - 3][cellX + x - 3] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 1 < 20 && cellY + y - 3 >= 0) { //upper right
+                                if (grid[cellY + y - 3][cellX + x - 1] == color) {
+                                    connects = true;
+                                }
+                            }
+                            if (cellX + x - 3 >= 0 && cellY + y - 1 < 20) { // lower left
+                                if (grid[cellY + y - 1][cellX + x - 3] == color) {
+                                    connects = true;
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        }
+        if (isCorner(grid, cellX, cellY)) {
+            connects = true;
+        }
+        if (!connects) { // if not diagonally connected return false
+            return false;
         }
         return true;
     }
