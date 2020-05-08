@@ -31,6 +31,11 @@ public class Piece {
         AllPieces pieceInst = new AllPieces();
         shape = pieceInst.piece_type(kind);
 
+        // Copy the shape
+        for(int row = 0; row < shape.length; row++) {
+            System.arraycopy(shape[row], 0, shapeCopy[row], 0, shape[row].length);
+        }
+
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
