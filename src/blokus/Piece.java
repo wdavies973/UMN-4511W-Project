@@ -45,13 +45,13 @@ public class Piece {
     // you'll need to access the grid.cells attribute to inspect cells,
     // the x,y coordinate will be the coordinate of the center of the shape array
     // overlayed with the map.
-    public boolean isValid(Grid grid, int x, int y) {
-        return false;
+    public boolean isValid(Color[][] grid, int x, int y) {
+        return x % 2 == 0;
     }
 
     // is there any valid location to put the piece? hint: use
     // isValid on every cell
-    public boolean anyValid(Grid grid) {
+    public boolean anyValid(Color[][] grid) {
         return false;
     }
 
@@ -59,7 +59,7 @@ public class Piece {
     // at this location (i.e. shape[1][1] should correspond to x,y). Use the color
     // attribute of this class to set the grid position. This method should check
     // if the position is valid and if not should do nothing
-    public void place(Grid grid, int x, int y) {
+    public void place(Color[][] grid, int x, int y) {
 
     }
 
@@ -69,8 +69,12 @@ public class Piece {
     }
 
     // cellX, cellY is center of the shape
-    public void drawHover(Graphics2D g, int cellX, int cellY, int drawX, int drawY, int width, int height) {
-        g.setColor(color);
+    public void drawHover(Color[][] grid, Graphics2D g, int cellX, int cellY, int drawX, int drawY, int width, int height) {
+        if(!isValid(grid, cellX, cellY)) {
+            g.setColor(Color.darkGray);
+        } else {
+            g.setColor(color);
+        }
 
         int x1 = Math.max(cellX - 2, 0);
         int x2 = Math.min(cellX + 2, 19);

@@ -66,8 +66,7 @@ public class Grid implements Component {
             hoverCellY = Math.min(hoverCellY, HEIGHT_CELLS - 1);
             hoverCellY = Math.max(hoverCellY, 0);
 
-
-            inHand.drawHover(g, hoverCellX, hoverCellY, x, y, cellWidthPX, cellHeightPX);
+            inHand.drawHover(cells, g, hoverCellX, hoverCellY, x, y, cellWidthPX, cellHeightPX);
         }
     }
 
@@ -75,5 +74,19 @@ public class Grid implements Component {
     public void mouseMoved(int x, int y) {
         this.mouseX = x;
         this.mouseY = y;
+    }
+
+    @Override
+    public void mouseRightClicked(int x, int y) {
+        if(inHand != null) {
+            inHand.rotateClockwise();
+        }
+    }
+
+    @Override
+    public void mouseClicked(int x, int y) {
+        if(inHand != null) {
+            inHand.place(cells, x, y);
+        }
     }
 }

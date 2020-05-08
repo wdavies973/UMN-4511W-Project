@@ -117,7 +117,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            board.mouseClicked(e.getX(), e.getY());
+        } else if(e.getButton() == MouseEvent.BUTTON3) {
+            board.mouseRightClicked(e.getX(), e.getY());
+        }
     }
 
     @Override

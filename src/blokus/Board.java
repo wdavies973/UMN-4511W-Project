@@ -20,4 +20,14 @@ public class Board implements Component {
     public void mouseMoved(int x, int y) {
         grid.mouseMoved(x, y);
     }
+
+    @Override
+    public void mouseRightClicked(int x, int y) {
+        grid.mouseRightClicked(x, y);
+    }
+
+    @Override
+    public void mouseClicked(int x, int y) {
+        grid.mouseClicked(x, y);
+    }
 }
