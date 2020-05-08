@@ -21,6 +21,10 @@ public class Grid extends View {
     private boolean drawDots;
     private Color dotTopLeft, dotTopRight, dotBottomLeft, dotBottomRight;
 
+    public Grid() {
+
+    }
+
     @Override
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         // Draw background
@@ -136,7 +140,9 @@ public class Grid extends View {
             cellY = Math.min(cellY, HEIGHT_CELLS - 1);
             cellY = Math.max(cellY, 0);
 
-            inHand.place(cells, cellX, cellY);
+            if(inHand.place(cells, cellX, cellY)) {
+               inHand = null;
+            }
         }
     }
 

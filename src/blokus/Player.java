@@ -1,27 +1,48 @@
 package blokus;
 
 import engine.View;
+import strategies.Strategy;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class PieceBank extends View {
+public class Player extends View {
+
+    private static final int TEXT_PADDING = 5;
+
+    public enum Style {
+        Top,
+        Bottom,
+        Left,
+        Right
+    }
 
     public interface Listener {
         void pieceSelected(Piece piece);
     }
 
-    public enum Style {
-        Vertical,
-        Horizontal
-    }
 
     private Listener listener;
     private final ArrayList<Piece> pieces = new ArrayList<>();
     private final Style style;
-    private boolean editable;
 
-    public PieceBank(Listener listener, Color color, Style style, boolean editable) {
+    private String name;
+    private Color color;
+
+    private boolean isTurn;
+
+    private Color turnHighlight = Color.green;
+
+    final static float[] dash1 = {15.0f};
+    private final BasicStroke basicStroke = new BasicStroke(5,
+            BasicStroke.CAP_BUTT,
+            BasicStroke.JOIN_MITER,
+            10.0f, dash1, 0.0f);
+
+    public Player(String name, Color color, Strategy strategy, Listener listener, Style style, boolean editable) {
+        this.name = name;
+        this.color = color;
+
         this.listener = listener;
         this.style = style;
 
@@ -29,9 +50,21 @@ public class PieceBank extends View {
             pieces.add(new Piece(color, i));
     }
 
+    public int getScore() {
+        int score = 0;
+
+        for(Piece piece : pieces) {
+            if(!piece.isPlaced()) {
+                score += piece.getSize();
+            }
+        }
+
+        return score;
+    }
+
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         // TODO this code is a bumbling pile of shit and needs to be reworked
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;
             int pieceWidth = (int)Math.ceil(width / 7.0);
 
@@ -52,7 +85,16 @@ public class PieceBank extends View {
                 int row = i / 7;
                 p.drawInBank(g, x + (i % 7) * pieceWidth, y + row * pieceHeight, pieceWidth, pieceHeight);
             }
-        } else if(style == Style.Vertical) {
+
+            // Draw "is turn" indicator
+            if(isTurn) {
+                g.setColor(turnHighlight);
+                Stroke s = g.getStroke();
+                g.setStroke(basicStroke);
+                g.drawRect(x - 2, y - 2, 7 * pieceWidth + 2, height + 2);
+                g.setStroke(s);
+            }
+        } else if(style == Style.Left || style == Style.Right) {
             int pieceHeight = (int)Math.ceil(height / 7.0);
             int pieceWidth = width / 3;
 
@@ -73,6 +115,33 @@ public class PieceBank extends View {
                 int col = i / 7;
                 p.drawInBank(g, x + col * pieceWidth, y + (i % 7) * pieceHeight, pieceWidth, pieceHeight);
             }
+
+            // Draw "is turn" indicator
+            if(isTurn) {
+                g.setColor(turnHighlight);
+                Stroke s = g.getStroke();
+                g.setStroke(basicStroke);
+                g.drawRect(x - 2, y - 2, 3 * pieceWidth + 4, 7 * pieceHeight + 2);
+                g.setStroke(s);
+            }
+        }
+
+        // Draw the score indicator
+        String label = name+" ("+getScore()+")";
+
+        g.setColor(Color.BLACK);
+        if(style == Style.Left) {
+            g.drawString(label, x, y - TEXT_PADDING);
+        } else if(style == Style.Right) {
+            int aiWidth = g.getFontMetrics().stringWidth(label);
+
+            g.drawString(label, x + width - aiWidth, y - TEXT_PADDING);
+        } else if(style == Style.Top) {
+            int aiWidth = g.getFontMetrics().stringWidth(label);
+
+            g.drawString(label, x - aiWidth - TEXT_PADDING * 2, y + g.getFontMetrics().getHeight());
+        } else if(style == Style.Bottom) {
+            g.drawString(label, x + width + TEXT_PADDING * 2, y + height - TEXT_PADDING);
         }
     }
 
@@ -82,7 +151,7 @@ public class PieceBank extends View {
 
         int pieceWidth, pieceHeight;
 
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             pieceHeight = getHeight() / 3;
             pieceWidth = (int) Math.ceil(getWidth() / 7.0);
 
@@ -107,14 +176,14 @@ public class PieceBank extends View {
 
         int index;
 
-        if(style == Style.Horizontal) {
+        if(style == Style.Top || style == Style.Bottom) {
             index = pieceX + pieceY * 7;
         } else {
             index = pieceY + pieceX * 7;
         }
 
-        System.out.println("selected: "+pieceX+","+pieceY+": "+index);
-
-        listener.pieceSelected(pieces.get(index));
+        if(!pieces.get(index).isPlaced()) {
+            listener.pieceSelected(pieces.get(index));
+        }
     }
 }

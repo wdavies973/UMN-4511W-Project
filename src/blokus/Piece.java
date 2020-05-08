@@ -2,12 +2,15 @@ package blokus;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Piece {
 
     // a three by three grid, 1 where a block exists, 0 for none.
     // any shape should be representable with the correct values
     private int[][] shape; //= new int[5][5];
+
+    private final int[][] shapeCopy = new int [5][5]; // shape copy that won't get rotated
 
     private static final int GRID_PADDING = 1;
     private static final int BANK_PADDING = 4;
@@ -24,8 +27,10 @@ public class Piece {
     public Piece(Color color, int kind) {
         this.color = color;
         this.kind = kind;
+
         AllPieces pieceInst = new AllPieces();
         shape = pieceInst.piece_type(kind);
+
     }
 
     // returns an arraylist containing every possible piece kind, just a convenience method,
@@ -289,7 +294,7 @@ public class Piece {
 
         for(int row = 0; row < 5; row++) {
             for(int col = 0; col < 5; col++) {
-                if(shape[row][col] == 1)
+                if(shapeCopy[row][col] == 1)
                     g.fillRect(drawX + col * cellWidth, drawY + row * cellHeight, cellWidth, cellHeight);
             }
         }
@@ -297,5 +302,9 @@ public class Piece {
 
     public void setPlaced(boolean placed) {
         this.placed = placed;
+    }
+
+    public boolean isPlaced() {
+        return placed;
     }
 }

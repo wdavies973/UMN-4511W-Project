@@ -1,12 +1,13 @@
 package blokus;
 
 import engine.View;
+import strategies.HumanStrategy;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 // controls the overall game and state
-public class Blokus extends View implements PieceBank.Listener {
+public class Blokus extends View implements Player.Listener {
 
     // draw 4 PieceBanks with grid in the center
     // piecebank will be roughly 20%? of width/height
@@ -15,10 +16,12 @@ public class Blokus extends View implements PieceBank.Listener {
 
     private Color betterGreen = new Color(0, 100, 0);
 
-    private PieceBank top = new PieceBank(this, Color.blue, PieceBank.Style.Horizontal, true);
-    private PieceBank bottom = new PieceBank(this, Color.red, PieceBank.Style.Horizontal, true);
-    private PieceBank left = new PieceBank(this, betterGreen, PieceBank.Style.Vertical, true);
-    private PieceBank right = new PieceBank(this, Color.yellow, PieceBank.Style.Vertical, true);
+    private Player top = new Player("John", Color.blue, new HumanStrategy(), this, Player.Style.Top, true);
+    private Player bottom = new Player("AI", Color.red, new HumanStrategy(), this, Player.Style.Bottom, true);
+    private Player left = new Player("AI", betterGreen, new HumanStrategy(),this,  Player.Style.Left, true);
+    private Player right = new Player("AI", Color.yellow, new HumanStrategy(),this, Player.Style.Right, true);
+
+    private int turn = 0;
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
