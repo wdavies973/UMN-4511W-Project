@@ -1,6 +1,7 @@
 package blokus;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Piece {
 
@@ -21,7 +22,7 @@ public class Piece {
         this.color = color;
         this.kind = kind;
 
-        // draws the cross shape
+        // the cross shape
         shape = new int[][]{
                 {0, 0, 0, 0, 0},
                 {0, 0, 1, 0, 0},
@@ -29,6 +30,19 @@ public class Piece {
                 {0, 0, 1, 0, 0},
                 {0, 0, 0, 0, 0},
         };
+//          random
+//        for(int i = 0; i < 5; i++) {
+//            for(int j = 0; j < 5; j++) {
+//                if(Math.random() <= 0.5) {
+//                    shape[i][j] = 1;
+//                }
+//            }
+//        }
+    }
+
+    // returns an arraylist containing every possible piece kind, just a convenience method
+    public static ArrayList<Piece> CREATE_ALL_PIECES(Color color) {
+        return new ArrayList<>();
     }
 
     // perform a matrix rotate transform on the "shape" 2D array
@@ -68,6 +82,12 @@ public class Piece {
         return 0;
     }
 
+    // kind is used as an ID of sorts and needs to be accessed by other parts
+    // of the program
+    public int getKind() {
+        return kind;
+    }
+
     // cellX, cellY is center of the shape
     public void drawHover(Color[][] grid, Graphics2D g, int cellX, int cellY, int drawX, int drawY, int width, int height) {
         if(!isValid(grid, cellX, cellY)) {
@@ -90,7 +110,24 @@ public class Piece {
                 }
             }
         }
+    }
 
+    public void drawFull(Graphics2D g, int drawX, int drawY, int width, int height, boolean locked) {
+        if(!locked) {
+            g.setColor(color);
+        } else {
+            g.setColor(Color.darkGray);
+        }
+
+        int cellWidth = width / 5;
+        int cellHeight = height / 5;
+
+        for(int row = 0; row < 5; row++) {
+            for(int col = 0; col < 5; col++) {
+                if(shape[row][col] == 1)
+                    g.fillRect(drawX + col * cellWidth, drawY + row * cellHeight, cellWidth, cellHeight);
+            }
+        }
     }
 
 }

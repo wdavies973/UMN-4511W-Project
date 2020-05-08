@@ -30,13 +30,13 @@ public class Grid implements Component {
 
         // Draw horizontal gridlines
         g.setColor(Color.darkGray);
-        for(int row = 0; row < HEIGHT_CELLS; row++) {
-            g.drawLine(x, y + row * cellHeightPX, x + width, y + row * cellHeightPX);
+        for(int row = 0; row < HEIGHT_CELLS + 1; row++) {
+            g.drawLine(x, y + row * cellHeightPX, x + WIDTH_CELLS * cellWidthPX, y + row * cellHeightPX);
         }
 
         // Draw vertical gridlines
-        for(int col = 0; col < WIDTH_CELLS; col++) {
-            g.drawLine(x + col * cellWidthPX, y, x + col * cellWidthPX, y + height);
+        for(int col = 0; col < WIDTH_CELLS + 1; col++) {
+            g.drawLine(x + col * cellWidthPX, y, x + col * cellWidthPX, y + HEIGHT_CELLS * cellHeightPX);
         }
 
         // Draw all the cells

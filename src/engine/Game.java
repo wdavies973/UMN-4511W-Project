@@ -15,7 +15,7 @@ public class Game extends JFrame implements WindowListener {
 
         addWindowListener(this);
 
-        panel = new GamePanel(600, 600);
+        panel = new GamePanel(900, 900);
 
         panel.addComponentListener(new ComponentAdapter() {
             @Override
@@ -29,7 +29,8 @@ public class Game extends JFrame implements WindowListener {
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //setLocationRelativeTo(null);
-        setLocation(-900, 500);
+        setResizable(false);
+        setLocation(-1000, 200);
         setVisible(true);
     }
 
