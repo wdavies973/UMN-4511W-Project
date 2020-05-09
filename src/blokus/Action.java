@@ -2,10 +2,14 @@ package blokus;
 
 public class Action {
 
-    public Piece piece;
+    public Piece piece; // null if unable to move
     public int rotation;
     public boolean flip;
     public int cellX, cellY;
+
+    private Action() {
+
+    }
 
     public Action(Piece piece, int rotation, boolean flip, int cellX, int cellY) {
         this.piece = piece;

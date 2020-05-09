@@ -20,8 +20,8 @@ public class Blokus extends View implements Player.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player bottom = new Player("Player 2", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
-    private final Player left = new Player("Player 3", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
+    private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
+    private final Player left = new Player("Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
     private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
@@ -30,6 +30,9 @@ public class Blokus extends View implements Player.Listener {
 
     private String winner = "";
     private boolean gameOver;
+
+    private static final int NUM_GAMES = 1;
+    private int gameNum = 0;
 
     private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(10);
 
@@ -58,47 +61,37 @@ public class Blokus extends View implements Player.Listener {
             /*
              * Progress game state
              */
+            nextTurn();
+
+            for(int i = 0; i < players.length; i++) {
+                Player currentTurn = players[(turn + i) % players.length];
+
+                if(currentTurn.startTurn(queue, grid)) {
+                    grid.setActiveWatcher(turn);
+                    return;
+                } else {
+                    currentTurn.setOutOfMoves(true);
+                }
+            }
+
+            // We haven't returned, that means the game is over,
+            // figure out the winner
 
             // step 1, is the game over?
             Player winner = null;
             int scoreMin = Integer.MAX_VALUE;
-            boolean anyPlay = false;
 
             for(Player p : players) {
                 if(p.getScore() < scoreMin) {
                     scoreMin = p.getScore();
                     winner = p;
                 }
-
-                if(p.canPlay(grid.cells)) {
-                    anyPlay = true;
-                    break;
-                } else {
-                    p.setOutOfMoves(true);
-                }
             }
 
-            // step 2, check if the game is over
-            if(!anyPlay) {
-                if(winner != null) {
-                    this.winner = winner.getName();
-                }
-
-                this.gameOver = true;
-                return;
+            this.gameOver = true;
+            if(winner != null) {
+                this.winner = winner.getName();
             }
-
-            // step 3, all is well, continue the game
-            nextTurn();
-
-            // skip a player if they can't make any moves
-            if(!players[turn].startTurn(queue, grid)) {
-                System.out.println("Skipping player");
-                nextTurn();
-                return;
-            }
-
-            grid.setActiveWatcher(turn);
         }
     }
 

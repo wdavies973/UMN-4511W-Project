@@ -76,8 +76,6 @@ public class Player extends View {
     }
 
     public boolean startTurn(BlockingQueue<Action> submissionQueue, Grid grid) {
-
-
         // Get all possible moves
         ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
 
@@ -86,15 +84,10 @@ public class Player extends View {
         boolean canStart = nodes.size() > 0;
 
         if(canStart) {
-            System.out.println(name+"'s turn is starting");
             strategy.turnStarted(submissionQueue, grid, nodes);
         }
 
         return canStart;
-    }
-
-    public boolean canPlay(Color[][] grid) {
-        return getAllPossibleMoves(grid).size() > 0;
     }
 
     public ArrayList<Action> getAllPossibleMoves(Color[][] grid) {
