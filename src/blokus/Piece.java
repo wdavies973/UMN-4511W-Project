@@ -18,6 +18,7 @@ public class Piece {
     private final int kind;
 
     private boolean placed; // helper variable for piece bank
+    private boolean simulatedPlaced;
 
     // the corner the piece must start at
     private int cornerX, cornerY;
@@ -228,9 +229,13 @@ public class Piece {
     // attribute of this class to set the grid position. This method should check
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
-    boolean place(Color[][] grid, int cellX, int cellY) {
-        if(!placed && isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
-            placed = true;
+    public boolean place(boolean isSimulated, Color[][] grid, int cellX, int cellY) {
+        if(((isSimulated && !simulatedPlaced) || (!isSimulated && !placed)) && isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
+            if(isSimulated) {
+                simulatedPlaced = true;
+            } else {
+                placed = true;
+            }
 
             for(int y = 0; y < 5; y++) {
                 for(int x = 0; x < 5; x++) {
@@ -401,6 +406,14 @@ public class Piece {
 
     public boolean isPlaced() {
         return placed;
+    }
+
+    public boolean isSimulatedPlaced() {
+        return simulatedPlaced;
+    }
+
+    public void setSimulatedPlaced(boolean simulatedPlaced) {
+        this.simulatedPlaced = simulatedPlaced;
     }
 
     public boolean equals(int[][] matrix) {

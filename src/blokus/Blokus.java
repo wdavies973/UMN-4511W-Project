@@ -1,7 +1,7 @@
 package blokus;
 
 import engine.View;
-import strategies.HumanStrategy;
+import strategies.MCTSStrategy;
 import strategies.RandomStrategy;
 
 import java.awt.*;
@@ -19,10 +19,10 @@ public class Blokus extends View implements Player.Listener {
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
-    private final Player left = new Player("Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
-    private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
+    private final Player bottom = new Player(0, "Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
+    private final Player right = new Player(1,"Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
+    private final Player top = new Player(2,"Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
+    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new MCTSStrategy(),this,  Player.Style.Left);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 
@@ -31,7 +31,7 @@ public class Blokus extends View implements Player.Listener {
     private String winner = "";
     private boolean gameOver;
 
-    private static final int NUM_GAMES = 100;
+    private static final int NUM_GAMES = 1;
     private int gameNum = 0;
 
     private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(10);
@@ -45,7 +45,7 @@ public class Blokus extends View implements Player.Listener {
         // bottom player starts
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
-        bottom.startTurn(queue, grid);
+        bottom.startTurn(queue, players, grid);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Blokus extends View implements Player.Listener {
             for(int i = 0; i < players.length; i++) {
                 Player currentTurn = players[(turn + i) % players.length];
 
-                if(currentTurn.startTurn(queue, grid)) {
+                if(currentTurn.startTurn(queue, players, grid)) {
                     grid.setActiveWatcher(turn);
                     return;
                 } else {
@@ -82,8 +82,8 @@ public class Blokus extends View implements Player.Listener {
             int scoreMin = Integer.MAX_VALUE;
 
             for(Player p : players) {
-                if(p.getScore() < scoreMin) {
-                    scoreMin = p.getScore();
+                if(p.getRemainingArea(false) < scoreMin) {
+                    scoreMin = p.getRemainingArea(false);
                     winner = p;
                 }
             }
@@ -182,7 +182,7 @@ public class Blokus extends View implements Player.Listener {
         winner = "";
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
-        bottom.startTurn(queue, grid);
+        bottom.startTurn(queue, players, grid);
     }
 
     @Override

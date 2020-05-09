@@ -1,6 +1,8 @@
 package blokus;
 
 import engine.View;
+import search.SimulatedAction;
+import search.SimulatedGrid;
 import strategies.HumanStrategy;
 import strategies.Strategy;
 
@@ -41,9 +43,12 @@ public class Player extends View {
 
     public int wins; // keeps track of wins for benchmarking purposes
 
-    public Player(String name, Color color, Strategy strategy, Listener listener, Style style) {
+    private int id; // 0-3, starting at bottom and going counter-clockwise
+
+    public Player(int id, String name, Color color, Strategy strategy, Listener listener, Style style) {
         this.name = name;
         this.strategy = strategy;
+        this.id = id;
 
         this.listener = listener;
         this.style = style;
@@ -65,11 +70,11 @@ public class Player extends View {
             pieces.add(new Piece(cornerX, cornerY, color, i));
     }
 
-    public int getScore() {
+    public int getRemainingArea(boolean isSimulated) {
         int score = 0;
 
         for(Piece piece : pieces) {
-            if(!piece.isPlaced()) {
+            if(!piece.isPlaced() || (isSimulated && !piece.isSimulatedPlaced())) {
                 score += piece.getSize();
             }
         }
@@ -77,7 +82,7 @@ public class Player extends View {
         return score;
     }
 
-    public boolean startTurn(BlockingQueue<Action> submissionQueue, Grid grid) {
+    public boolean startTurn(BlockingQueue<Action> submissionQueue, Player[] players, Grid grid) {
         // Get all possible moves
         ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
 
@@ -86,7 +91,8 @@ public class Player extends View {
         boolean canStart = nodes.size() > 0;
 
         if(canStart) {
-            strategy.turnStarted(submissionQueue, grid, nodes);
+            SimulatedGrid simGrid = new SimulatedGrid(grid, players, id);
+            strategy.turnStarted(submissionQueue, simGrid, new SimulatedAction(simGrid, id, null));
         }
 
         return canStart;
@@ -96,7 +102,7 @@ public class Player extends View {
         ArrayList<Action> moves = new ArrayList<>();
 
         for(Piece piece : pieces) {
-            if(piece.isPlaced()) continue;
+            if(piece.isPlaced() || piece.isSimulatedPlaced()) continue;
 
             moves.addAll(piece.getPossibleMoves(grid));
         }
@@ -168,7 +174,7 @@ public class Player extends View {
         }
 
         // Draw the score indicator
-        String label = name + " (" + getScore() + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
+        String label = name + " (" + getRemainingArea(false) + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
 
         g.setColor(Color.BLACK);
         if(style == Style.Left) {
@@ -243,6 +249,12 @@ public class Player extends View {
             c.setPlaced(false);
         }
         outOfMoves = false;
+    }
+
+    public void resetSimulated() {
+        for(Piece c : pieces) {
+            c.setSimulatedPlaced(false);
+        }
     }
 
     public void setOutOfMoves(boolean outOfMoves) {

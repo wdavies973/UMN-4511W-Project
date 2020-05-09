@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class Grid extends View {
 
-    private static final int WIDTH_CELLS = 20, HEIGHT_CELLS = 20;
+    public static final int WIDTH_CELLS = 20, HEIGHT_CELLS = 20;
 
     private static final int PADDING = 1;
 
@@ -106,7 +106,7 @@ public class Grid extends View {
     void move(Action node) {
         node.piece.apply(false, node.flip, node.rotation);
 
-        if(!node.piece.place(cells, node.cellX, node.cellY)) {
+        if(!node.piece.place(false, cells, node.cellX, node.cellY)) {
             System.out.println("Action rejected");
         }
     }
