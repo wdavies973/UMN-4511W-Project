@@ -31,7 +31,7 @@ public class Blokus extends View implements Player.Listener {
     private String winner = "";
     private boolean gameOver;
 
-    private static final int NUM_GAMES = 1;
+    private static final int NUM_GAMES = 100;
     private int gameNum = 0;
 
     private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(10);
@@ -91,6 +91,22 @@ public class Blokus extends View implements Player.Listener {
             this.gameOver = true;
             if(winner != null) {
                 this.winner = winner.getName();
+                winner.wins++;
+            }
+
+            gameNum++;
+
+            System.out.println("Game "+gameNum+" / "+NUM_GAMES+" finished");
+
+            if(gameNum < NUM_GAMES) {
+                reset();
+            } else {
+                System.out.println("---------------- RESULTS ----------------");
+                // Print results
+                for(Player p : players) {
+                    System.out.println(p);
+                }
+                System.out.println("-----------------------------------------");
             }
         }
     }
@@ -174,6 +190,11 @@ public class Blokus extends View implements Player.Listener {
         super.keyPressed(key);
 
         if(key.getKeyCode() == KeyEvent.VK_F12) {
+            gameNum = 0;
+            for(Player p : players) {
+                p.wins = 0;
+            }
+
             reset();
         }
     }

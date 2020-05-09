@@ -39,6 +39,8 @@ public class Player extends View {
 
     private boolean outOfMoves;
 
+    public int wins; // keeps track of wins for benchmarking purposes
+
     public Player(String name, Color color, Strategy strategy, Listener listener, Style style) {
         this.name = name;
         this.strategy = strategy;
@@ -249,5 +251,13 @@ public class Player extends View {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", wins=" + wins +
+                '}';
     }
 }
