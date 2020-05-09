@@ -7,19 +7,20 @@ import strategies.RandomStrategy;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 // controls the overall game and state
-public class Blokus extends View implements Player.Listener, Grid.Listener {
+public class Blokus extends View implements Player.Listener {
 
     // draw 4 PieceBanks with grid in the center
     // piecebank will be roughly 20%? of width/height
 
-    private final Grid grid = new Grid(this);
+    private final Grid grid = new Grid();
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
+    private final Player bottom = new Player("Player 2", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
     private final Player left = new Player("Player 3", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
     private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
 
@@ -30,6 +31,8 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     private String winner = "";
     private boolean gameOver;
 
+    private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(10);
+
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
 
@@ -39,38 +42,67 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
         // bottom player starts
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
-        bottom.startTurn(grid);
+        bottom.startTurn(queue, grid);
     }
 
     @Override
-    public void turnFinished() {
-        boolean any = false;
-        int score = Integer.MAX_VALUE;
-        int winner = -1;
+    public void update() {
+        if(gameOver) return;
 
-        for(int i = 0; i < players.length; i++) {
-            Player p = players[i];
+        Action action = queue.poll();
 
-            if(p.getScore() < score) {
-                score = p.getScore();
-                winner = i;
+        if(action != null) {
+            // applies the action
+            grid.move(action);
+
+            /*
+             * Progress game state
+             */
+
+            // step 1, is the game over?
+            Player winner = null;
+            int scoreMin = Integer.MAX_VALUE;
+            boolean anyPlay = false;
+
+            for(Player p : players) {
+                if(p.getScore() < scoreMin) {
+                    scoreMin = p.getScore();
+                    winner = p;
+                }
+
+                if(p.canPlay(grid.cells)) {
+                    anyPlay = true;
+                    break;
+                } else {
+                    p.setOutOfMoves(true);
+                }
             }
 
-            if(p.canPlay(grid.cells)) {
-                any = true;
-                break;
-            } else {
-                p.setOutOfMoves(true);
+            // step 2, check if the game is over
+            if(!anyPlay) {
+                if(winner != null) {
+                    this.winner = winner.getName();
+                }
+
+                this.gameOver = true;
+                return;
             }
-        }
 
-        if(!any) {
-            // game over!
-            this.winner = players[winner].getName();
-            this.gameOver = true;
-            return;
-        }
+            // step 3, all is well, continue the game
+            nextTurn();
 
+            // skip a player if they can't make any moves
+            if(!players[turn].startTurn(queue, grid)) {
+                System.out.println("Skipping player");
+                nextTurn();
+                return;
+            }
+
+            grid.setActiveWatcher(turn);
+        }
+    }
+
+    private void nextTurn() {
         turn++;
         if(turn >= 4) {
             turn = 0;
@@ -83,14 +115,6 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
         grid.setInHand(null);
 
         players[turn].setTurn(true);
-
-        // skip a player if they can't make any moves
-        if(!players[turn].startTurn(grid)) {
-            turnFinished();
-            return;
-        }
-
-        grid.setActiveWatcher(turn);
     }
 
     @Override
@@ -135,15 +159,29 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
         grid.setInHand(piece);
     }
 
+    public void reset() {
+        queue.clear();
+
+        grid.reset();
+
+        for(Player p : players) {
+            p.reset();
+        }
+
+        turn = 0;
+        gameOver = false;
+        winner = "";
+        bottom.setTurn(true);
+        grid.setActiveWatcher(0);
+        bottom.startTurn(queue, grid);
+    }
+
     @Override
     public void keyPressed(KeyEvent key) {
         super.keyPressed(key);
 
         if(key.getKeyCode() == KeyEvent.VK_F12) {
-            turn = -1;
-            gameOver = false;
-            winner = "";
-            turnFinished();
+            reset();
         }
     }
 }

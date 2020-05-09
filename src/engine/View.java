@@ -42,6 +42,10 @@ public abstract class View {
         }
     }
 
+    public void update() {
+
+    }
+
     protected abstract void draw(Graphics2D g, int x, int y, int width, int height);
 
     public void setActiveWatcher(int activeWatcher) {

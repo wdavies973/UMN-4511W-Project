@@ -266,8 +266,6 @@ public class Piece {
     }
 
     public int[][] apply(boolean copy, boolean flip, int rotation) {
-        reset();
-
         if(flip) {
             flip();
         }
@@ -293,18 +291,18 @@ public class Piece {
 
     }
 
-    private void addMoves(ArrayList<Node> moves, Color[][] grid, boolean flip, int rotation) {
+    private void addMoves(ArrayList<Action> moves, Color[][] grid, boolean flip, int rotation) {
         for(int row = 0; row < 20; row++) {
             for(int col = 0; col < 20; col++) {
                 if(isValid(grid, col, row)) {
-                    moves.add(new Node(this, rotation, flip, col, row));
+                    moves.add(new Action(this, rotation, flip, col, row));
                 }
             }
         }
     }
 
-    public ArrayList<Node> getPossibleMoves(Color[][] grid) {
-        ArrayList<Node> moves = new ArrayList<>();
+    public ArrayList<Action> getPossibleMoves(Color[][] grid) {
+        ArrayList<Action> moves = new ArrayList<>();
 
         reset();
 

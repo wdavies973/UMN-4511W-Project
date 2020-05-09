@@ -5,8 +5,8 @@ import strategies.HumanStrategy;
 import strategies.Strategy;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
 
 public class Player extends View {
 
@@ -75,15 +75,20 @@ public class Player extends View {
         return score;
     }
 
-    public boolean startTurn(Grid grid) {
-        // Get all possible moves
-        ArrayList<Node> nodes = getAllPossibleMoves(grid.cells);
+    public boolean startTurn(BlockingQueue<Action> submissionQueue, Grid grid) {
 
-        System.out.println("Found "+nodes.size()+" potential moves");
+
+        // Get all possible moves
+        ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
+
+        //System.out.println("Found "+nodes.size()+" potential moves");
 
         boolean canStart = nodes.size() > 0;
 
-        if(canStart) strategy.turnStarted(grid, nodes);
+        if(canStart) {
+            System.out.println(name+"'s turn is starting");
+            strategy.turnStarted(submissionQueue, grid, nodes);
+        }
 
         return canStart;
     }
@@ -92,8 +97,8 @@ public class Player extends View {
         return getAllPossibleMoves(grid).size() > 0;
     }
 
-    public ArrayList<Node> getAllPossibleMoves(Color[][] grid) {
-        ArrayList<Node> moves = new ArrayList<>();
+    public ArrayList<Action> getAllPossibleMoves(Color[][] grid) {
+        ArrayList<Action> moves = new ArrayList<>();
 
         for(Piece piece : pieces) {
             if(piece.isPlaced()) continue;
@@ -107,7 +112,7 @@ public class Player extends View {
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;
-            int pieceWidth = (int)Math.ceil(width / 7.0);
+            int pieceWidth = (int) Math.ceil(width / 7.0);
 
             // Draw horizontal gridlines
             g.setColor(Color.darkGray);
@@ -136,7 +141,7 @@ public class Player extends View {
                 g.setStroke(s);
             }
         } else if(style == Style.Left || style == Style.Right) {
-            int pieceHeight = (int)Math.ceil(height / 7.0);
+            int pieceHeight = (int) Math.ceil(height / 7.0);
             int pieceWidth = width / 3;
 
             // Draw horizontal gridlines
@@ -168,7 +173,7 @@ public class Player extends View {
         }
 
         // Draw the score indicator
-        String label = name+" ("+getScore()+")" + (outOfMoves ? " - NO MOVES LEFT" : "");
+        String label = name + " (" + getScore() + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
 
         g.setColor(Color.BLACK);
         if(style == Style.Left) {
@@ -238,14 +243,11 @@ public class Player extends View {
         return strategy;
     }
 
-    @Override
-    public void keyPressed(KeyEvent key) {
-        if(key.getKeyCode() == KeyEvent.VK_F12) {
-            for(Piece c : pieces) {
-                c.setPlaced(false);
-            }
-            outOfMoves = false;
+    public void reset() {
+        for(Piece c : pieces) {
+            c.setPlaced(false);
         }
+        outOfMoves = false;
     }
 
     public void setOutOfMoves(boolean outOfMoves) {

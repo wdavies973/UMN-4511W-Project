@@ -72,6 +72,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, width, height);
 
+            // update
+            blokus.update();
+
             // draw board
             blokus.draw(g);
 
