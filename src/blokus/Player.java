@@ -2,12 +2,12 @@ package blokus;
 
 import engine.View;
 import search.SimulatedAction;
-import search.SimulatedGrid;
 import strategies.HumanStrategy;
 import strategies.Strategy;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 
 public class Player extends View {
@@ -43,12 +43,15 @@ public class Player extends View {
 
     public int wins; // keeps track of wins for benchmarking purposes
 
-    private int id; // 0-3, starting at bottom and going counter-clockwise
+    private final int id; // 0-3, starting at bottom and going counter-clockwise
+
+    private final Color color;
 
     public Player(int id, String name, Color color, Strategy strategy, Listener listener, Style style) {
         this.name = name;
         this.strategy = strategy;
         this.id = id;
+        this.color = color;
 
         this.listener = listener;
         this.style = style;
@@ -70,11 +73,11 @@ public class Player extends View {
             pieces.add(new Piece(cornerX, cornerY, color, i));
     }
 
-    public int getRemainingArea(boolean isSimulated) {
+    public int getRemainingArea() {
         int score = 0;
 
         for(Piece piece : pieces) {
-            if(!piece.isPlaced() || (isSimulated && !piece.isSimulatedPlaced())) {
+            if(!piece.isPlaced()) {
                 score += piece.getSize();
             }
         }
@@ -91,8 +94,8 @@ public class Player extends View {
         boolean canStart = nodes.size() > 0;
 
         if(canStart) {
-            SimulatedGrid simGrid = new SimulatedGrid(grid, players, id);
-            strategy.turnStarted(submissionQueue, simGrid, new SimulatedAction(simGrid, id, null));
+            System.out.println("Starting turn for "+id);
+            strategy.turnStarted(submissionQueue, grid, new SimulatedAction(grid.cells, players, id, new HashSet<>(), null));
         }
 
         return canStart;
@@ -102,7 +105,19 @@ public class Player extends View {
         ArrayList<Action> moves = new ArrayList<>();
 
         for(Piece piece : pieces) {
-            if(piece.isPlaced() || piece.isSimulatedPlaced()) continue;
+            if(piece.isPlaced()) continue;
+
+            moves.addAll(piece.getPossibleMoves(grid));
+        }
+
+        return moves;
+    }
+
+    public ArrayList<Action> getAllActionsExcluding(Color[][] grid, HashSet<Integer> exclude) {
+        ArrayList<Action> moves = new ArrayList<>();
+
+        for(Piece piece : pieces) {
+            if(piece.isPlaced() || exclude.contains(piece.getKind())) continue;
 
             moves.addAll(piece.getPossibleMoves(grid));
         }
@@ -174,7 +189,7 @@ public class Player extends View {
         }
 
         // Draw the score indicator
-        String label = name + " (" + getRemainingArea(false) + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
+        String label = name + " (" + getRemainingArea() + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
 
         g.setColor(Color.BLACK);
         if(style == Style.Left) {
@@ -251,12 +266,6 @@ public class Player extends View {
         outOfMoves = false;
     }
 
-    public void resetSimulated() {
-        for(Piece c : pieces) {
-            c.setSimulatedPlaced(false);
-        }
-    }
-
     public void setOutOfMoves(boolean outOfMoves) {
         this.outOfMoves = outOfMoves;
     }
@@ -265,11 +274,17 @@ public class Player extends View {
         return name;
     }
 
+
+
     @Override
     public String toString() {
         return "Player{" +
                 "name='" + name + '\'' +
                 ", wins=" + wins +
                 '}';
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

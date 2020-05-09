@@ -1,9 +1,8 @@
 package strategies;
 
-import blokus.Grid;
 import blokus.Action;
+import blokus.Grid;
 import search.SimulatedAction;
-import search.SimulatedGrid;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
@@ -32,7 +31,7 @@ import java.util.concurrent.BlockingQueue;
 public class MCTSStrategy implements Strategy {
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_SECS = 5;
+    private static final int COMPUTE_TIME_SECS = 15;
 
     private static class MNode {
         private final MNode parent;
@@ -56,7 +55,7 @@ public class MCTSStrategy implements Strategy {
     }
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, SimulatedGrid simulatedGrid, SimulatedAction rootAction) {
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedAction rootAction) {
         long start = System.nanoTime();
 
         MNode root = new MNode(null, rootAction);
@@ -98,8 +97,6 @@ public class MCTSStrategy implements Strategy {
     }
 
     private double[] MCTS(MNode node) {
-        System.out.println("Called");
-
         double[] result;
 
         MNode bestChild = null;
@@ -120,7 +117,7 @@ public class MCTSStrategy implements Strategy {
 
         if(bestChild.n == 0) {
             expand(bestChild);
-            result = playout(bestChild);
+            result = playout(node);
         } else {
             result = MCTS(bestChild);
         }
@@ -130,8 +127,6 @@ public class MCTSStrategy implements Strategy {
 
     private void expand(MNode node) {
         ArrayList<SimulatedAction> expanded = node.action.expand();
-
-        System.out.println("Expanded with: "+expanded.size());
 
         ArrayList<MNode> nodes = new ArrayList<>();
 
@@ -144,14 +139,11 @@ public class MCTSStrategy implements Strategy {
 
     // should take the current position
     private double[] playout(MNode current) {
-
-        System.out.println("PLAYOUT");
         return current.action.playout();
     }
 
     private double uct(MNode node) {
         if(node.parent == null) {
-            System.out.println("Error");
             throw new RuntimeException("Error");
         }
 

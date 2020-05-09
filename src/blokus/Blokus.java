@@ -1,6 +1,7 @@
 package blokus;
 
 import engine.View;
+import strategies.HumanStrategy;
 import strategies.MCTSStrategy;
 import strategies.RandomStrategy;
 
@@ -55,6 +56,8 @@ public class Blokus extends View implements Player.Listener {
         Action action = queue.poll();
 
         if(action != null) {
+            System.out.println("Received");
+
             // applies the action
             grid.move(action);
 
@@ -82,8 +85,8 @@ public class Blokus extends View implements Player.Listener {
             int scoreMin = Integer.MAX_VALUE;
 
             for(Player p : players) {
-                if(p.getRemainingArea(false) < scoreMin) {
-                    scoreMin = p.getRemainingArea(false);
+                if(p.getRemainingArea() < scoreMin) {
+                    scoreMin = p.getRemainingArea();
                     winner = p;
                 }
             }

@@ -3,7 +3,6 @@ package strategies;
 import blokus.Action;
 import blokus.Grid;
 import search.SimulatedAction;
-import search.SimulatedGrid;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,8 +14,8 @@ public class HumanStrategy implements Strategy {
     private BlockingQueue<Action> submit;
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, SimulatedGrid simulatedGrid, SimulatedAction root) {
-        this.grid = simulatedGrid.getReferenceGrid();
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedAction root) {
+        this.grid = grid;
         this.submit = submit;
     }
 
