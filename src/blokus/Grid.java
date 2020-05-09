@@ -103,10 +103,10 @@ public class Grid extends View {
         this.inHand = inHand;
     }
 
-    void move(Action node) {
-        node.piece.apply(false, node.flip, node.rotation);
+    void move(Action action) {
+        action.piece.apply(false, action.flip, action.rotation);
 
-        if(!node.piece.place(false, cells, node.cellX, node.cellY)) {
+        if(!action.piece.place(false, cells, action.cellX, action.cellY)) {
             System.out.println("Action rejected");
         }
     }

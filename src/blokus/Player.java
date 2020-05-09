@@ -94,8 +94,13 @@ public class Player extends View {
         boolean canStart = nodes.size() > 0;
 
         if(canStart) {
+
+            int normalized = id;
+            normalized -= 1;
+            if(normalized < 0) normalized = 3;
+
             System.out.println("Starting turn for "+id);
-            strategy.turnStarted(submissionQueue, grid, new SimulatedAction(grid.cells, players, id, new HashSet<>(), null));
+            strategy.turnStarted(submissionQueue, grid, new SimulatedAction(grid.cells, players, normalized));
         }
 
         return canStart;

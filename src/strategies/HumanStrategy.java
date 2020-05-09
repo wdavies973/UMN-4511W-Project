@@ -25,7 +25,10 @@ public class HumanStrategy implements Strategy {
 
         if(submit != null && grid.getInHand() != null) {
             Action action = new Action(grid.getInHand(), 0, false, cell.x, cell.y);
-            submit.add(action);
+
+            if(action.piece.isValid(grid.cells, cell.x, cell.y)) {
+                submit.add(action);
+            }
         }
     }
 

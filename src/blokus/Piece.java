@@ -229,7 +229,15 @@ public class Piece {
     // if the position is valid and if not should do nothing
     // returns whether a piece was actually placed or not
     public boolean place(boolean isSimulated, Color[][] grid, int cellX, int cellY) {
-        if((isSimulated || !placed) && isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
+        if(placed) {
+            System.out.println("ALREADY PLACED!!");
+        }
+
+        if(!isValid(grid, cellX, cellY)) {
+            System.out.println("NOT VALID!!!");
+        }
+
+        if((!placed) && isValid(grid, cellX, cellY)) { // if you're about to return true, also set "placed" to true
             if(!isSimulated) {
                 placed = true;
             }

@@ -14,11 +14,12 @@ public class RandomStrategy implements Strategy {
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedAction root) {
-        ArrayList<SimulatedAction> actions = root.expand();
+        root.expand();
+        ArrayList<SimulatedAction> actions = root.children;
 
-        SimulatedAction n = actions.get(rnd.nextInt(actions.size()));
+        SimulatedAction n = actions.get(0);
 
-        System.out.println("playing node"+n.getAction());
+        System.out.println("playing node"+n.getAction()+" for player "+n.getPlayer()+" actions "+actions.size());
 
         submit.add(n.getAction());
     }

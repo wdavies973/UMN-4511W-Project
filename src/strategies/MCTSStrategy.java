@@ -31,7 +31,7 @@ import java.util.concurrent.BlockingQueue;
 public class MCTSStrategy implements Strategy {
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_SECS = 15;
+    private static final int COMPUTE_TIME_SECS = 1;
 
     private static class MNode {
         private final MNode parent;
@@ -59,9 +59,7 @@ public class MCTSStrategy implements Strategy {
         long start = System.nanoTime();
 
         MNode root = new MNode(null, rootAction);
-        for(SimulatedAction action : rootAction.expand()) {
-            root.children.add(new MNode(root, action));
-        }
+        expand(root);
 
         while(true) {
             long elapsed = System.nanoTime() - start;
@@ -117,7 +115,7 @@ public class MCTSStrategy implements Strategy {
 
         if(bestChild.n == 0) {
             expand(bestChild);
-            result = playout(node);
+            result = playout(bestChild);
         } else {
             result = MCTS(bestChild);
         }
@@ -126,7 +124,8 @@ public class MCTSStrategy implements Strategy {
     }
 
     private void expand(MNode node) {
-        ArrayList<SimulatedAction> expanded = node.action.expand();
+        node.action.expand();
+        ArrayList<SimulatedAction> expanded = node.action.children;
 
         ArrayList<MNode> nodes = new ArrayList<>();
 
