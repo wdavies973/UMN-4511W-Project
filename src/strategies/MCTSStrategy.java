@@ -30,7 +30,7 @@ import java.util.concurrent.BlockingQueue;
 public class MCTSStrategy implements Strategy {
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_MS = 2000;
+    private static final int COMPUTE_TIME_MS = 500;
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {

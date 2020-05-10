@@ -115,7 +115,8 @@ public class SimulatedNode {
          * Note: if there are no nodes that can be expanded, try expanded three more times
          * for the other players, otherwise, set the children to an empty array
          */
-
+        // for the player array
+        // bottom is 0, right is 1, top is 2, left is 3
         int nextPlayer = (player + 1) % players.length;
 
         ArrayList<Action> childActions = new ArrayList<>();
@@ -210,6 +211,8 @@ public class SimulatedNode {
     public ArrayList<SimulatedNode> getChildren() {
         return children;
     }
+
+    public int getPlayer() {return player; };
 
     public double getUCB1() {
         if(visits == 0) {
