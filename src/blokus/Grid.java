@@ -3,11 +3,10 @@ package blokus;
 import engine.View;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class Grid extends View {
 
-    private static final int WIDTH_CELLS = 20, HEIGHT_CELLS = 20;
+    public static final int WIDTH_CELLS = 20, HEIGHT_CELLS = 20;
 
     private static final int PADDING = 1;
 
@@ -21,16 +20,6 @@ public class Grid extends View {
 
     private boolean drawDots;
     private Color dotTopLeft, dotTopRight, dotBottomLeft, dotBottomRight;
-
-    public interface Listener {
-        void turnFinished();
-    }
-
-    private final Listener listener;
-
-    public Grid(Listener listener) {
-        this.listener = listener;
-    }
 
     @Override
     public void draw(Graphics2D g, int x, int y, int width, int height) {
@@ -114,18 +103,12 @@ public class Grid extends View {
         this.inHand = inHand;
     }
 
-    public void move(Piece piece, int cellX, int cellY) {
-        if(piece.place(cells, cellX, cellY)) {
-            listener.turnFinished();
+    void move(Action action) {
+        action.piece.apply(false, action.flip, action.rotation);
+
+        if(!action.piece.place(false, cells, action.cellX, action.cellY)) {
+            System.out.println("Action rejected");
         }
-    }
-
-    public void move(Node node) {
-        node.piece.apply(false, node.flip, node.rotation);
-
-        node.piece.place(cells, node.cellX, node.cellY);
-
-        listener.turnFinished();
     }
 
     public Point mouseToCell(int x, int y) {
@@ -155,13 +138,8 @@ public class Grid extends View {
         return inHand;
     }
 
-    @Override
-    public void keyPressed(KeyEvent key) {
-        super.keyPressed(key);
-
-        // reset the game
-        if(key.getKeyCode() == KeyEvent.VK_F12) {
-            cells = new Color[HEIGHT_CELLS][WIDTH_CELLS];
-        }
+    public void reset() {
+        cells = new Color[HEIGHT_CELLS][WIDTH_CELLS];
     }
+
 }

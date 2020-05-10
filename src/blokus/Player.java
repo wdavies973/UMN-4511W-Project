@@ -1,12 +1,14 @@
 package blokus;
 
 import engine.View;
+import search.SimulatedNode;
 import strategies.HumanStrategy;
 import strategies.Strategy;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.concurrent.BlockingQueue;
 
 public class Player extends View {
 
@@ -39,9 +41,17 @@ public class Player extends View {
 
     private boolean outOfMoves;
 
-    public Player(String name, Color color, Strategy strategy, Listener listener, Style style) {
+    public int wins; // keeps track of wins for benchmarking purposes
+
+    private final int id; // 0-3, starting at bottom and going counter-clockwise
+
+    private final Color color;
+
+    public Player(int id, String name, Color color, Strategy strategy, Listener listener, Style style) {
         this.name = name;
         this.strategy = strategy;
+        this.id = id;
+        this.color = color;
 
         this.listener = listener;
         this.style = style;
@@ -63,7 +73,7 @@ public class Player extends View {
             pieces.add(new Piece(cornerX, cornerY, color, i));
     }
 
-    public int getScore() {
+    public int getRemainingArea() {
         int score = 0;
 
         for(Piece piece : pieces) {
@@ -75,25 +85,21 @@ public class Player extends View {
         return score;
     }
 
-    public boolean startTurn(Grid grid) {
+    public boolean startTurn(BlockingQueue<Action> submissionQueue, Player[] players, Grid grid) {
         // Get all possible moves
-        ArrayList<Node> nodes = getAllPossibleMoves(grid.cells);
-
-        System.out.println("Found "+nodes.size()+" potential moves");
+        ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
 
         boolean canStart = nodes.size() > 0;
 
-        if(canStart) strategy.turnStarted(grid, nodes);
+        if(canStart) {
+            strategy.turnStarted(submissionQueue, grid, SimulatedNode.CREATE_ROOT(grid.cells, players, id));
+        }
 
         return canStart;
     }
 
-    public boolean canPlay(Color[][] grid) {
-        return getAllPossibleMoves(grid).size() > 0;
-    }
-
-    public ArrayList<Node> getAllPossibleMoves(Color[][] grid) {
-        ArrayList<Node> moves = new ArrayList<>();
+    public ArrayList<Action> getAllPossibleMoves(Color[][] grid) {
+        ArrayList<Action> moves = new ArrayList<>();
 
         for(Piece piece : pieces) {
             if(piece.isPlaced()) continue;
@@ -104,10 +110,22 @@ public class Player extends View {
         return moves;
     }
 
+    public ArrayList<Action> getAllActionsExcluding(Color[][] grid, HashSet<Integer> exclude) {
+        ArrayList<Action> moves = new ArrayList<>();
+
+        for(Piece piece : pieces) {
+            if(piece.isPlaced() || exclude.contains(piece.getKind())) continue;
+
+            moves.addAll(piece.getPossibleMoves(grid));
+        }
+
+        return moves;
+    }
+
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;
-            int pieceWidth = (int)Math.ceil(width / 7.0);
+            int pieceWidth = (int) Math.ceil(width / 7.0);
 
             // Draw horizontal gridlines
             g.setColor(Color.darkGray);
@@ -136,7 +154,7 @@ public class Player extends View {
                 g.setStroke(s);
             }
         } else if(style == Style.Left || style == Style.Right) {
-            int pieceHeight = (int)Math.ceil(height / 7.0);
+            int pieceHeight = (int) Math.ceil(height / 7.0);
             int pieceWidth = width / 3;
 
             // Draw horizontal gridlines
@@ -168,7 +186,7 @@ public class Player extends View {
         }
 
         // Draw the score indicator
-        String label = name+" ("+getScore()+")" + (outOfMoves ? " - NO MOVES LEFT" : "");
+        String label = name + " (" + getRemainingArea() + ")" + (outOfMoves ? " - NO MOVES LEFT" : "");
 
         g.setColor(Color.BLACK);
         if(style == Style.Left) {
@@ -238,14 +256,11 @@ public class Player extends View {
         return strategy;
     }
 
-    @Override
-    public void keyPressed(KeyEvent key) {
-        if(key.getKeyCode() == KeyEvent.VK_F12) {
-            for(Piece c : pieces) {
-                c.setPlaced(false);
-            }
-            outOfMoves = false;
+    public void reset() {
+        for(Piece c : pieces) {
+            c.setPlaced(false);
         }
+        outOfMoves = false;
     }
 
     public void setOutOfMoves(boolean outOfMoves) {
@@ -254,5 +269,19 @@ public class Player extends View {
 
     public String getName() {
         return name;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", wins=" + wins +
+                '}';
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

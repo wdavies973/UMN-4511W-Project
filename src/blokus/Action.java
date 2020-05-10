@@ -1,13 +1,17 @@
 package blokus;
 
-public class Node {
+public class Action {
 
-    public Piece piece;
+    public Piece piece; // null if unable to move
     public int rotation;
     public boolean flip;
     public int cellX, cellY;
 
-    public Node(Piece piece, int rotation, boolean flip, int cellX, int cellY) {
+    private Action() {
+
+    }
+
+    public Action(Piece piece, int rotation, boolean flip, int cellX, int cellY) {
         this.piece = piece;
         this.rotation = rotation;
         this.flip = flip;
@@ -15,7 +19,7 @@ public class Node {
         this.cellY = cellY;
     }
 
-    public boolean equals(Node move) {
+    public boolean equals(Action move) {
         if(move.piece.getKind() != piece.getKind()) {
             return false;
         }

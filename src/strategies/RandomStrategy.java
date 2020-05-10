@@ -1,23 +1,26 @@
 package strategies;
 
-import blokus.Node;
+import blokus.Action;
 import blokus.Grid;
+import search.SimulatedNode;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 public class RandomStrategy implements Strategy {
 
     private final Random rnd = new Random();
 
     @Override
-    public void turnStarted(Grid grid, ArrayList<Node> moves) {
-        Node n = moves.get(rnd.nextInt(moves.size()));
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+        ArrayList<SimulatedNode> actions = root.expandAndReturn();
 
-        System.out.println("playing node"+n);
-        System.out.println("possible moves: "+ moves.size());
+        SimulatedNode n = actions.get(rnd.nextInt(actions.size()));
 
-        grid.move(n);
+        //System.out.println("playing node"+n.getAction()+" for player "+n.getPlayer()+" actions "+actions.size());
+
+        submit.add(n.getAction());
     }
 
 }

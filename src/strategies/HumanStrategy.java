@@ -1,27 +1,34 @@
 package strategies;
 
-import blokus.Node;
+import blokus.Action;
 import blokus.Grid;
+import search.SimulatedNode;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
 
 public class HumanStrategy implements Strategy {
 
     private Grid grid;
+    private BlockingQueue<Action> submit;
 
     @Override
-    public void turnStarted(Grid grid, ArrayList<Node> moves) {
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
         this.grid = grid;
+        this.submit = submit;
     }
 
     @Override
     public void mouseClicked(int x, int y) {
         Point cell = grid.mouseToCell(x, y);
 
-        if(grid != null && grid.getInHand() != null) {
-            grid.move(grid.getInHand(), cell.x, cell.y);
+        if(submit != null && grid.getInHand() != null) {
+            Action action = new Action(grid.getInHand(), 0, false, cell.x, cell.y);
+
+            if(action.piece.isValid(grid.cells, cell.x, cell.y)) {
+                submit.add(action);
+            }
         }
     }
 
