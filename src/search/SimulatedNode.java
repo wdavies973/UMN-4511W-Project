@@ -90,7 +90,7 @@ public class SimulatedNode {
         // COPY THE HASHSETS
         this.excludedPieces = new HashMap<>();
         for(int playerId : excludedPieces.keySet()) {
-            this.excludedPieces.put(playerId, (HashSet<Integer>)(excludedPieces.get(playerId).clone()));
+            this.excludedPieces.put(playerId, new HashSet<>(excludedPieces.get(playerId)));
         }
 
         // APPLY THE ACTION
