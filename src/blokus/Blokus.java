@@ -1,7 +1,6 @@
 package blokus;
 
 import engine.View;
-import strategies.BarasonaStrategy;
 import strategies.HumanStrategy;
 import strategies.MCTSStrategy;
 import strategies.RandomStrategy;
@@ -9,7 +8,7 @@ import strategies.RandomStrategy;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.*;
 
 // controls the overall game and state
 public class Blokus extends View implements Player.Listener {
@@ -22,9 +21,9 @@ public class Blokus extends View implements Player.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     private final Player bottom = new Player(0, "Player 2", Color.red, new MCTSStrategy(), this, Player.Style.Bottom);
-    private final Player right = new Player(1,"Player 4", Color.yellow, new HumanStrategy(),this, Player.Style.Right);
-    private final Player top = new Player(2,"Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
+    private final Player right = new Player(1,"Player 4", Color.yellow, new HumanStrategy(grid),this, Player.Style.Right);
+    private final Player top = new Player(2,"Player 1", Color.blue, new MCTSStrategy(), this, Player.Style.Top);
+    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new MCTSStrategy(),this,  Player.Style.Left);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 
@@ -33,17 +32,20 @@ public class Blokus extends View implements Player.Listener {
     private String winner = "";
     private boolean gameOver;
 
+    // TODO don't forget to random assign strategies to starting positions
     private static final int NUM_GAMES = 1;
     private int gameNum = 0;
 
-    private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(10);
+    private static ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(1);
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
 
         grid.addWatchers(players[0].getStrategy(), players[1].getStrategy(), players[2].getStrategy(), players[3].getStrategy());
         grid.setDrawDots(Color.blue, Color.yellow, BETTER_GREEN, Color.red);
+    }
 
+    public void beginGame() {
         // bottom player starts
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
@@ -54,9 +56,17 @@ public class Blokus extends View implements Player.Listener {
     public void update() {
         if(gameOver) return;
 
-        Action action = queue.poll();
+        Action action = null;
+
+        try {
+            action = queue.take();
+        } catch(InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if(action != null) {
+            System.out.println("Receiving action from player "+turn);
+
             // applies the action
             grid.move(action);
 
@@ -68,11 +78,10 @@ public class Blokus extends View implements Player.Listener {
             for(int i = 0; i < players.length; i++) {
                 Player currentTurn = players[(turn + i) % players.length];
 
-                if(currentTurn.startTurn(queue, players, grid)) {
-                    grid.setInHand(null);
+                grid.setActiveWatcher((turn + i) % players.length);
 
-                    players[turn].setTurn(true);
-                    grid.setActiveWatcher(turn);
+                if(currentTurn.startTurn(queue, players, grid)) {
+                    turn = (turn + i) % players.length;
                     return;
                 } else {
                     currentTurn.setOutOfMoves(true);
@@ -134,7 +143,9 @@ public class Blokus extends View implements Player.Listener {
 
         g.setColor(Color.black);
         if(gameOver) {
-            g.drawString("GAME OVER - "+winner+" wins!", x + 15, y + height - 15);
+            g.drawString("GAME OVER - "+winner+" wins!", x + 15, y + height - 15 - g.getFontMetrics().getHeight());
+            g.drawString("F12 to restart", x + 15, y + height - 15);
+
         }
 
     }
@@ -181,9 +192,7 @@ public class Blokus extends View implements Player.Listener {
         turn = 0;
         gameOver = false;
         winner = "";
-        bottom.setTurn(true);
-        grid.setActiveWatcher(0);
-        bottom.startTurn(queue, players, grid);
+        beginGame();
     }
 
     @Override

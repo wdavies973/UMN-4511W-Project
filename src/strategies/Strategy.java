@@ -1,7 +1,6 @@
 package strategies;
 
 import blokus.Action;
-import blokus.Grid;
 import engine.ViewWatcher;
 import search.SimulatedNode;
 
@@ -11,6 +10,6 @@ import java.util.concurrent.BlockingQueue;
 public interface Strategy extends ViewWatcher {
 
     // simulated action root does not actually have its own "action", it just has children
-    void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root);
+    void turnStarted(BlockingQueue<Action> submit, SimulatedNode root);
 
 }
