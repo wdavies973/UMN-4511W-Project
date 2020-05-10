@@ -105,24 +105,15 @@ public class Piece {
         for(int y = 0; y < 5; y++) {
             for(int x = 0; x < 5; x++) {
                 if(shape[y][x] == 1) {
-                    if((cellX + x - 2) == 0 && (cellY + y - 2) == 0) {
-                        cornered = true;
-                    }
-                    if((cellX + x - 2) == 19 && (cellY + y - 2) == 0) {
-                        cornered = true;
-                    }
-                    if((cellX + x - 2) == 19 && (cellY + y - 2) == 19) {
-                        cornered = true;
-                    }
-                    if((cellX + x - 2) == 0 && (cellY + y - 2) == 19) {
+                    if((cellX + x - 2) == cornerX && (cellY + y - 2) == cornerY) {
                         cornered = true;
                     }
                 }
-
             }
         }
         return cornered;
     }
+
 
 
     // returns whether the following placement of the piece is valid,
