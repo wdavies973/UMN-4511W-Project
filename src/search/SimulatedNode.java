@@ -90,7 +90,7 @@ public class SimulatedNode {
         // COPY THE HASHSETS
         this.excludedPieces = new HashMap<>();
         for(int playerId : excludedPieces.keySet()) {
-            this.excludedPieces.put(playerId, new HashSet<>(excludedPieces.get(playerId)));
+            this.excludedPieces.put(playerId, (HashSet<Integer>)(excludedPieces.get(playerId).clone()));
         }
 
         // APPLY THE ACTION
@@ -100,20 +100,15 @@ public class SimulatedNode {
         this.action = action;
 
         // BAN THE PIECE FOR FUTURE USE FROM THIS PLAYER
-        HashSet<Integer> excluded = excludedPieces.get(player);
+        HashSet<Integer> excluded = this.excludedPieces.get(player);
         excluded.add(action.piece.getKind());
-    }
-
-    public ArrayList<SimulatedNode> expand() {
-        expand(this.grid);
-        return children;
     }
 
     // SimulatedNodes are lazily expanded - they are only expanded on demand,
     // this will populate the children with available moves
-    private void expand(Color[][] grid) {
+    public ArrayList<SimulatedNode> expand() {
         if(children != null) {
-            throw new IllegalCallerException("WARN: Expand should only be called once");
+            return children;
         }
 
         /*
@@ -143,10 +138,12 @@ public class SimulatedNode {
                 children.add(new SimulatedNode(grid, players, nextPlayer, excludedPieces, this, action));
             }
 
-        } else { // dead end, cannot expand more (end of game)
-            System.out.println("NOTICE: SimulatedNode fully expanded");
         }
+
+        return children;
     }
+
+    public Color[][] playout;
 
     /*
      * Randomly play out this game state by successively applying
@@ -160,25 +157,21 @@ public class SimulatedNode {
             throw new IllegalCallerException("Please call expand() before calling playout()");
         }
 
-        Color[][] copy = new Color[Grid.HEIGHT_CELLS][Grid.WIDTH_CELLS];
-
-        for(int row = 0; row < Grid.HEIGHT_CELLS; row++) {
-            for(int col = 0; col < Grid.WIDTH_CELLS; col++) {
-                copy[row][col] = this.grid[row][col];
-            }
-        }
-
         SimulatedNode currentNode = this;
 
         while(true) {
             ArrayList<SimulatedNode> childNodes = currentNode.children;
 
             if(childNodes.size() == 0) {
+                //SimulatedAction.PRINT_GRID(currentNode.grid);
+
+                this.playout = currentNode.grid;
+
                 // PLAYOUT GAME OVER
-                return countScores(copy);
+                return countScores(currentNode.grid);
             } else {
                 currentNode = childNodes.get(random.nextInt(childNodes.size()));
-                currentNode.expand(copy);
+                currentNode.expand();
             }
         }
     }
@@ -201,6 +194,35 @@ public class SimulatedNode {
         }
 
         return scores;
+    }
+
+    public void update(double[] scores) {
+        this.score += scores[this.player];
+        this.visits++;
+    }
+
+    public double getVisits() {
+        return visits;
+    }
+
+    public double getAverageScore() {
+        return this.score / this.visits;
+    }
+
+    public double[] getScore() {
+        return countScores(this.grid);
+    }
+
+    public ArrayList<SimulatedNode> getChildren() {
+        return children;
+    }
+
+    public double getUCB1() {
+        if(visits == 0) {
+            return Double.MAX_VALUE;
+        }
+
+        return (score / visits) + 2 * Math.sqrt(Math.log(parent.visits) / visits);
     }
 
     public Action getAction() {

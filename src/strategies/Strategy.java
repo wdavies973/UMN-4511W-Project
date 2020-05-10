@@ -3,7 +3,6 @@ package strategies;
 import blokus.Action;
 import blokus.Grid;
 import engine.ViewWatcher;
-import search.SimulatedAction;
 import search.SimulatedNode;
 
 import java.util.concurrent.BlockingQueue;

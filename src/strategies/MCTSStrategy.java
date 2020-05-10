@@ -2,10 +2,8 @@ package strategies;
 
 import blokus.Action;
 import blokus.Grid;
-import search.SimulatedAction;
 import search.SimulatedNode;
 
-import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
 // implements MCTS-max^n
@@ -32,126 +30,63 @@ import java.util.concurrent.BlockingQueue;
 public class MCTSStrategy implements Strategy {
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_SECS = 10;
-
-    private static class MNode {
-        private final MNode parent;
-        private ArrayList<MNode> children = new ArrayList<>();
-
-        // the action that is associated with it
-        private final SimulatedAction action;
-
-        private double s = 0; // total score
-        private double n = 0; // visits
-
-        public MNode(MNode parent, SimulatedAction action) {
-            this.parent = parent;
-            this.action = action;
-        }
-
-        public void update(double[] scores) {
-            s += scores[action.getPlayer()];
-            n++;
-        }
-    }
+    private static final int COMPUTE_TIME_MS = 2000;
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+        long start = System.nanoTime();
 
+        root.expand();
 
-//        long start = System.nanoTime();
-//
-//        MNode root = new MNode(null, rootAction);
-//        expand(root);
-//
-//        while(true) {
-//            long elapsed = System.nanoTime() - start;
-//
-//            if(elapsed / 1_000_000_000 >= COMPUTE_TIME_SECS) {
-//                break;
-//            }
-//
-//            double[] result = MCTS(root);
-//            root.update(result);
-//        }
-//
-//        /*
-//         * Choose final move, whichever child has the highest score
-//         */
-//        MNode bestChild = null;
-//        double max = Double.MIN_VALUE;
-//
-//        for(MNode child : root.children) {
-//            double score = child.s / child.n;
-//
-//            if(score > max) {
-//                max = score;
-//                bestChild = child;
-//            }
-//        }
-//
-//        System.out.println("Score: "+max);
-//
-//        if(bestChild == null) {
-//            throw new RuntimeException("An error occurred");
-//        }
-//
-//        submit.add(bestChild.action.getAction());
-    }
+        while((System.nanoTime() - start) / 1_000_000 < COMPUTE_TIME_MS) {
+            double[] result = MCTS(root);
+            root.update(result);
+        }
 
-    private double[] MCTS(MNode node) {
-        MNode bestChild = null;
-        double maxUct = Double.MIN_VALUE;
+        double maxScore = Double.MIN_VALUE;
+        SimulatedNode bestChild = null;
 
-        for(MNode child : node.children) {
-            double uct = uct(child);
-
-            if(uct > maxUct) {
-                maxUct = uct;
+        for(SimulatedNode child : root.getChildren()) {
+            if(child.getAverageScore() > maxScore) {
+                maxScore = child.getAverageScore();
                 bestChild = child;
             }
         }
 
-        if(bestChild == null) {
-            throw new RuntimeException("Best child cannot be null");
+        if(bestChild  == null) {
+            throw new IllegalStateException("An error occurred");
+        }
+
+        submit.add(bestChild.getAction());
+    }
+
+    private double[] MCTS(SimulatedNode node) {
+        SimulatedNode bestChild = null;
+        double maxUCB1 = Double.MIN_VALUE;
+
+        if(node.getChildren().size() == 0) {
+            return node.getScore();
+        } else {
+            for(SimulatedNode child : node.getChildren()) {
+                double ucb1 = child.getUCB1();
+
+                if(ucb1 > maxUCB1) {
+                    maxUCB1 = ucb1;
+                    bestChild = child;
+                }
+            }
         }
 
         double[] result;
 
-        if(bestChild.n == 0) {
-            result = playout(bestChild);
-            expand(bestChild);
+        if(bestChild.getVisits() == 0) {
+            bestChild.expand();
+            result = bestChild.playout();
         } else {
             result = MCTS(bestChild);
         }
         bestChild.update(result);
         return result;
-    }
-
-    private void expand(MNode node) {
-        node.action.expand();
-        ArrayList<SimulatedAction> expanded = node.action.children;
-
-        ArrayList<MNode> nodes = new ArrayList<>();
-
-        for(SimulatedAction simAction : expanded) {
-            nodes.add(new MNode(node, simAction));
-        }
-
-        node.children = nodes;
-    }
-
-    // should take the current position
-    private double[] playout(MNode current) {
-        return current.action.playout();
-    }
-
-    private double uct(MNode node) {
-        if(node.n == 0) {
-            return Double.MAX_VALUE;
-        }
-
-        return (node.s / node.n) + 2 * Math.sqrt(Math.log(node.parent.n) / node.n);
     }
 
 }
