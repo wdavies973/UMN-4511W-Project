@@ -173,9 +173,7 @@ public class AllPieces {
         piece_type[19] = a19;
         piece_type[20] = a20;
 
-
     }
-
 
     public int[][] piece_type(int index) {
         int[][] copy = new int[5][5];

@@ -143,8 +143,6 @@ public class SimulatedNode {
         return children;
     }
 
-    public Color[][] playout;
-
     /*
      * Randomly play out this game state by successively applying
      * actions from "children", make sure grid is reset afterwords though.
@@ -163,10 +161,6 @@ public class SimulatedNode {
             ArrayList<SimulatedNode> childNodes = currentNode.children;
 
             if(childNodes.size() == 0) {
-                //SimulatedAction.PRINT_GRID(currentNode.grid);
-
-                this.playout = currentNode.grid;
-
                 // PLAYOUT GAME OVER
                 return countScores(currentNode.grid);
             } else {
@@ -227,5 +221,26 @@ public class SimulatedNode {
 
     public Action getAction() {
         return action;
+    }
+
+    public static void PRINT_GRID(Color[][] grid) {
+        for(int row = 0; row < Grid.HEIGHT_CELLS; row++) {
+            for(int col = 0; col < Grid.WIDTH_CELLS; col++) {
+                if(grid[row][col] != null) {
+                    if(grid[row][col].getRGB() == Color.blue.getRGB()) {
+                        System.out.print("B ");
+                    } else if(grid[row][col].getRGB() == Color.yellow.getRGB()) {
+                        System.out.print("Y ");
+                    } else if(grid[row][col].getRGB() == Color.red.getRGB()) {
+                        System.out.print("R ");
+                    } else {
+                        System.out.print("G ");
+                    }
+                } else {
+                    System.out.print("X ");
+                }
+            }
+            System.out.println();
+        }
     }
 }

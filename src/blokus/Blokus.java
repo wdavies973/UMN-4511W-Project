@@ -1,7 +1,6 @@
 package blokus;
 
 import engine.View;
-import search.SimulatedNode;
 import strategies.MCTSStrategy;
 import strategies.RandomStrategy;
 
@@ -47,11 +46,6 @@ public class Blokus extends View implements Player.Listener {
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
         bottom.startTurn(queue, players, grid);
-
-//        SimulatedNode sn = SimulatedNode.CREATE_ROOT(grid.cells, players, 0);
-//        sn.expand();
-//        sn.playout();
-//        grid.cells = sn.playout;
     }
 
     @Override
