@@ -4,13 +4,14 @@ import blokus.Action;
 import blokus.Grid;
 import search.SimulatedNode;
 
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
 public class BarasonaStrategy implements Strategy {
 
     private Strategy strategy;
 
-    private int turn;
+    private int turn = 0;
 
     public BarasonaStrategy(Strategy strategy) {
         this.strategy = strategy;
@@ -20,6 +21,7 @@ public class BarasonaStrategy implements Strategy {
     public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
         turn++;
 
+        ArrayList<SimulatedNode> actions = root.expand();
         SimulatedNode node = root.expand().get(50);
 
         submit.add(node.getAction());
