@@ -10,15 +10,14 @@ import java.util.*;
 // represents a complete copy of the game that can be mutated without affecting the actual game
 public class SimulatedAction {
 
+    private final Color[][] grid;
+    private final Player[] players;
+    private final int player;
+
     private final HashMap<Integer, HashSet<Integer>> playedPieces;
 
     private static final Random random = new Random();
 
-    private final Color[][] grid;
-
-    private final Player[] players;
-
-    private final int player;
     Action action;
 
     public ArrayList<SimulatedAction> children;
@@ -39,6 +38,8 @@ public class SimulatedAction {
         this.playedPieces.put(1, new HashSet<>());
         this.playedPieces.put(2, new HashSet<>());
         this.playedPieces.put(3, new HashSet<>());
+
+        PRINT_GRID(this.grid);
     }
 
     private SimulatedAction(Color[][] grid, Player[] players, int player, HashMap<Integer, HashSet<Integer>> playedPieces, Action action) {
@@ -57,16 +58,10 @@ public class SimulatedAction {
         this.playedPieces.put(1, new HashSet<>(playedPieces.get(1)));
         this.playedPieces.put(2, new HashSet<>(playedPieces.get(2)));
         this.playedPieces.put(3, new HashSet<>(playedPieces.get(3)));
-
-
     }
 
     private void apply(Color[][] grid) {
         if(action != null) {
-            //System.out.println(action);
-
-            System.out.println("Player "+player+" is playing piece: "+action.piece.getKind());
-
             action.piece.apply(false, action.flip, action.rotation);
 
             if(!action.piece.place(true, grid, action.cellX, action.cellY)) {
@@ -78,20 +73,8 @@ public class SimulatedAction {
 
             HashSet<Integer> set = playedPieces.get(player);
             set.add(action.piece.getKind());
-        } else {
-            System.out.println("Could not apply");
         }
     }
-
-//    private void rollbackApply(Color[][] grid) {
-//        if(action != null) {
-//            for(int row = 0; row < Grid.HEIGHT_CELLS; row++) {
-//                System.arraycopy(beforeApply[row], 0, grid[row], 0, Grid.WIDTH_CELLS);
-//            }
-//
-//            playedPieces.remove(action.piece.getKind());
-//        }
-//    }
 
     public void expand() {
         expand(this.grid);
@@ -103,13 +86,6 @@ public class SimulatedAction {
         }
 
         int index = (player + 1) % players.length;
-
-        System.out.println("Expanding player "+player+" with "+playedPieces.get(player).size());
-
-        for(int piece : playedPieces.get(player)) {
-            System.out.print(piece+" ");
-        }
-        System.out.println();
 
         ArrayList<Action> possibleActions = players[index].getAllActionsExcluding(grid, playedPieces.get(index));
 
@@ -126,7 +102,6 @@ public class SimulatedAction {
 
     // pre-condition: children array already populated
     public double[] playout() {
-        System.out.println("PLAYOUT");
         if(playedOut != null) {
             throw new RuntimeException("Cannot play out simulated action twice");
         }
@@ -147,7 +122,7 @@ public class SimulatedAction {
 
                 if(possible.size() > 0) {
                     // Play a random child
-                    action = possible.get(0);
+                    action = possible.get(random.nextInt(possible.size()));
 
                     action.apply(copy);
                     action.expand(copy);
@@ -165,7 +140,6 @@ public class SimulatedAction {
             if(!anyPlayed) {
                 // determine scores (higher must be better, so take max number of cells and subtract remaining pieces)
                 double[] array = new double[]{countCells(copy, players[0]), countCells(copy, players[1]), countCells(copy, players[2]), countCells(copy, players[3])};
-                System.out.println(Arrays.toString(array));
                 this.playedOut = copy;
                 return array;
             }

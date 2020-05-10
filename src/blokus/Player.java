@@ -1,7 +1,7 @@
 package blokus;
 
 import engine.View;
-import search.SimulatedAction;
+import search.SimulatedNode;
 import strategies.HumanStrategy;
 import strategies.Strategy;
 
@@ -89,18 +89,10 @@ public class Player extends View {
         // Get all possible moves
         ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
 
-        //System.out.println("Found "+nodes.size()+" potential moves");
-
         boolean canStart = nodes.size() > 0;
 
         if(canStart) {
-
-            int normalized = id;
-            normalized -= 1;
-            if(normalized < 0) normalized = 3;
-
-            System.out.println("Starting turn for "+id);
-            strategy.turnStarted(submissionQueue, grid, new SimulatedAction(grid.cells, players, normalized));
+            strategy.turnStarted(submissionQueue, grid, SimulatedNode.CREATE_ROOT(grid.cells, players, id));
         }
 
         return canStart;

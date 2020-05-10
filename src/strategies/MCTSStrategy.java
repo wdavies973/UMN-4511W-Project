@@ -3,6 +3,7 @@ package strategies;
 import blokus.Action;
 import blokus.Grid;
 import search.SimulatedAction;
+import search.SimulatedNode;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
@@ -31,7 +32,7 @@ import java.util.concurrent.BlockingQueue;
 public class MCTSStrategy implements Strategy {
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_SECS = 1;
+    private static final int COMPUTE_TIME_SECS = 10;
 
     private static class MNode {
         private final MNode parent;
@@ -55,48 +56,48 @@ public class MCTSStrategy implements Strategy {
     }
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedAction rootAction) {
-        long start = System.nanoTime();
-
-        MNode root = new MNode(null, rootAction);
-        expand(root);
-
-        while(true) {
-            long elapsed = System.nanoTime() - start;
-
-            if(elapsed / 1_000_000_000 >= COMPUTE_TIME_SECS) {
-                break;
-            }
-
-            double[] result = MCTS(root);
-            root.update(result);
-        }
-
-        /*
-         * Choose final move, whichever child has the highest score
-         */
-        MNode bestChild = null;
-        double maxUct = Double.MIN_VALUE;
-
-        for(MNode child : root.children) {
-            double uct = uct(child);
-
-            if(uct > maxUct) {
-                maxUct = uct;
-                bestChild = child;
-            }
-        }
-
-        if(bestChild == null) {
-            throw new RuntimeException("An error occurred");
-        }
-
-        submit.add(bestChild.action.getAction());
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+//        long start = System.nanoTime();
+//
+//        MNode root = new MNode(null, rootAction);
+//        expand(root);
+//
+//        while(true) {
+//            long elapsed = System.nanoTime() - start;
+//
+//            if(elapsed / 1_000_000_000 >= COMPUTE_TIME_SECS) {
+//                break;
+//            }
+//
+//            double[] result = MCTS(root);
+//            root.update(result);
+//        }
+//
+//        /*
+//         * Choose final move, whichever child has the highest score
+//         */
+//        MNode bestChild = null;
+//        double max = Double.MIN_VALUE;
+//
+//        for(MNode child : root.children) {
+//            double score = child.s / child.n;
+//
+//            if(score > max) {
+//                max = score;
+//                bestChild = child;
+//            }
+//        }
+//
+//        System.out.println("Score: "+max);
+//
+//        if(bestChild == null) {
+//            throw new RuntimeException("An error occurred");
+//        }
+//
+//        submit.add(bestChild.action.getAction());
     }
 
     private double[] MCTS(MNode node) {
-        double[] result;
-
         MNode bestChild = null;
         double maxUct = Double.MIN_VALUE;
 
@@ -113,9 +114,11 @@ public class MCTSStrategy implements Strategy {
             throw new RuntimeException("Best child cannot be null");
         }
 
+        double[] result;
+
         if(bestChild.n == 0) {
-            expand(bestChild);
             result = playout(bestChild);
+            expand(bestChild);
         } else {
             result = MCTS(bestChild);
         }
@@ -142,10 +145,6 @@ public class MCTSStrategy implements Strategy {
     }
 
     private double uct(MNode node) {
-        if(node.parent == null) {
-            throw new RuntimeException("Error");
-        }
-
         if(node.n == 0) {
             return Double.MAX_VALUE;
         }

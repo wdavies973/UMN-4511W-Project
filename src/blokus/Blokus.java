@@ -1,16 +1,12 @@
 package blokus;
 
 import engine.View;
-import search.SimulatedAction;
-import strategies.HumanStrategy;
 import strategies.MCTSStrategy;
 import strategies.RandomStrategy;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 // controls the overall game and state
@@ -23,7 +19,7 @@ public class Blokus extends View implements Player.Listener {
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private final Player bottom = new Player(0, "Player 2", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
+    private final Player bottom = new Player(0, "Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
     private final Player right = new Player(1,"Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
     private final Player top = new Player(2,"Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
     private final Player left = new Player(3,"Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);

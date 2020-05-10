@@ -2,7 +2,7 @@ package strategies;
 
 import blokus.Action;
 import blokus.Grid;
-import search.SimulatedAction;
+import search.SimulatedNode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,13 +13,12 @@ public class RandomStrategy implements Strategy {
     private final Random rnd = new Random();
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedAction root) {
-        root.expand();
-        ArrayList<SimulatedAction> actions = root.children;
+    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+        ArrayList<SimulatedNode> actions = root.expandAndReturn();
 
-        SimulatedAction n = actions.get(0);
+        SimulatedNode n = actions.get(rnd.nextInt(actions.size()));
 
-        System.out.println("playing node"+n.getAction()+" for player "+n.getPlayer()+" actions "+actions.size());
+        //System.out.println("playing node"+n.getAction()+" for player "+n.getPlayer()+" actions "+actions.size());
 
         submit.add(n.getAction());
     }

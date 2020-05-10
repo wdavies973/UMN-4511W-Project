@@ -276,6 +276,8 @@ public class Piece {
     }
 
     public int[][] apply(boolean copy, boolean flip, int rotation) {
+        reset();
+
         if(flip) {
             flip();
         }
