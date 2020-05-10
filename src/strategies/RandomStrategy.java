@@ -15,6 +15,7 @@ public class RandomStrategy implements Strategy {
         Node n = moves.get(rnd.nextInt(moves.size()));
 
         System.out.println("playing node"+n);
+        System.out.println("possible moves: "+ moves.size());
 
         grid.move(n);
     }

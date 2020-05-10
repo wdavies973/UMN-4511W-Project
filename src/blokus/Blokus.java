@@ -19,8 +19,8 @@ public class Blokus extends View implements Player.Listener, Grid.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     private final Player top = new Player("Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player bottom = new Player("Player 2", Color.red, new RandomStrategy(), this, Player.Style.Bottom);
-    private final Player left = new Player("Player 3", BETTER_GREEN, new HumanStrategy(),this,  Player.Style.Left);
+    private final Player bottom = new Player("Player 2", Color.red, new HumanStrategy(), this, Player.Style.Bottom);
+    private final Player left = new Player("Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
     private final Player right = new Player("Player 4", Color.yellow, new RandomStrategy(),this, Player.Style.Right);
 
     private final Player[] players = new Player[]{bottom, right, top, left};

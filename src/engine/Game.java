@@ -30,7 +30,7 @@ public class Game extends JFrame implements WindowListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //setLocationRelativeTo(null);
         setResizable(false);
-        setLocation(-1000, 200);
+        //setLocation(-1000, 200);
         setVisible(true);
     }
 
