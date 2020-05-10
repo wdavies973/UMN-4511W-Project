@@ -18,7 +18,7 @@ public class BarasonaStrategy implements Strategy {
     }
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+    public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         turn++;
 
         ArrayList<SimulatedNode> actions = root.expand();
@@ -31,7 +31,7 @@ public class BarasonaStrategy implements Strategy {
         if(turn > 8) {
 
             // after
-            strategy.turnStarted(submit, grid, root);
+            //strategy.turnStarted(submit, grid, root);
         } else {
             // barsona
         }

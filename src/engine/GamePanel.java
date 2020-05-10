@@ -63,6 +63,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void run() {
         init();
 
+        // Start update thread
+        new Thread(() -> {
+            blokus.beginGame();
+
+            while(true) {
+                blokus.update();
+            }
+        }).start();
+
         long start, elapsed, wait;
 
         while(running) {
@@ -71,9 +80,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
             // Clear the screen
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, width, height);
-
-            // update
-            blokus.update();
 
             // draw board
             blokus.draw(g);

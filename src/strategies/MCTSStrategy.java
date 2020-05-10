@@ -33,7 +33,7 @@ public class MCTSStrategy implements Strategy {
     private static final int COMPUTE_TIME_MS = 2000;
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+    public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         long start = System.nanoTime();
 
         root.expand();

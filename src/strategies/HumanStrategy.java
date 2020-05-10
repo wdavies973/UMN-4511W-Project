@@ -10,12 +10,15 @@ import java.util.concurrent.BlockingQueue;
 
 public class HumanStrategy implements Strategy {
 
-    private Grid grid;
+    private final Grid grid;
     private BlockingQueue<Action> submit;
 
-    @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+    public HumanStrategy(Grid grid) {
         this.grid = grid;
+    }
+
+    @Override
+    public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         this.submit = submit;
     }
 
@@ -27,6 +30,7 @@ public class HumanStrategy implements Strategy {
             Action action = new Action(grid.getInHand(), cell.x, cell.y);
 
             if(grid.getInHand().isValid(grid.cells, cell.x, cell.y)) {
+                grid.setInHand(null);
                 submit.add(action);
             }
         }
@@ -34,14 +38,14 @@ public class HumanStrategy implements Strategy {
 
     @Override
     public void mouseRightClicked(int x, int y) {
-        if(grid != null && grid.getInHand() != null) {
+        if(grid.getInHand() != null) {
             grid.getInHand().rotateClockwise();
         }
     }
 
     @Override
     public void mouseMiddleClicked(int x, int y) {
-        if(grid != null && grid.getInHand() != null) {
+        if(grid.getInHand() != null) {
             grid.getInHand().flip();
         }
     }
@@ -49,7 +53,7 @@ public class HumanStrategy implements Strategy {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_R) {
-            if(grid != null && grid.getInHand() != null) {
+            if(grid.getInHand() != null) {
                 grid.getInHand().reset();
             }
         }

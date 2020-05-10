@@ -13,7 +13,7 @@ public class RandomStrategy implements Strategy {
     private final Random rnd = new Random();
 
     @Override
-    public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+    public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         ArrayList<SimulatedNode> actions = root.expand();
 
         SimulatedNode n = actions.get(rnd.nextInt(actions.size()));

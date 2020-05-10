@@ -86,13 +86,20 @@ public class Player extends View {
     }
 
     public boolean startTurn(BlockingQueue<Action> submissionQueue, Player[] players, Grid grid) {
+        if(outOfMoves) {
+            return false;
+        }
+
         // Get all possible moves
         ArrayList<Action> nodes = getAllPossibleMoves(grid.cells);
 
         boolean canStart = nodes.size() > 0;
 
+        System.out.println(id+"has "+nodes.size());
+
         if(canStart) {
-            strategy.turnStarted(submissionQueue, grid, SimulatedNode.CREATE_ROOT(grid.cells, players, id));
+            isTurn = true;
+            strategy.turnStarted(submissionQueue, SimulatedNode.CREATE_ROOT(grid.cells, players, id));
         }
 
         return canStart;
@@ -261,6 +268,7 @@ public class Player extends View {
             c.setPlaced(false);
         }
         outOfMoves = false;
+        isTurn = false;
     }
 
     public void setOutOfMoves(boolean outOfMoves) {
