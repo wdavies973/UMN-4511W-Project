@@ -21,10 +21,10 @@ public class Blokus extends View implements Player.Listener {
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private final Player bottom = new Player(0, "Player 2", Color.red, new strategies.BarasonaStrategy( new MCTSStrategy()), this, Player.Style.Bottom);
-    private final Player right = new Player(1,"Player 4", Color.yellow, new MCTSStrategy(),this, Player.Style.Right);
-    private final Player top = new Player(2,"Player 1", Color.blue, new MCTSStrategy(), this, Player.Style.Top);
-    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new MCTSStrategy(),this,  Player.Style.Left);
+    private final Player bottom = new Player(0, "Player 2", Color.red, new strategies.BarasonaStrategy(0, new MCTSStrategy()), this, Player.Style.Bottom);
+    private final Player right = new Player(1,"Player 4", Color.yellow, new strategies.BarasonaStrategy(1, new MCTSStrategy()),this, Player.Style.Right);
+    private final Player top = new Player(2,"Player 1", Color.blue, new strategies.BarasonaStrategy(2, new MCTSStrategy()), this, Player.Style.Top);
+    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new strategies.BarasonaStrategy(3, new MCTSStrategy()),this,  Player.Style.Left);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 

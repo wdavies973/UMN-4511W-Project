@@ -1,5 +1,7 @@
 package blokus;
 
+import java.awt.*;
+
 public class Action {
 
     public Piece piece; // null if unable to move
@@ -54,6 +56,10 @@ public class Action {
 
     public Piece getPiece() {
         return this.piece;
+    }
+
+    public boolean isValid(Color[][] grid, int cellX, int cellY) {
+        return this.piece.isValid(grid, cellX, cellY);
     }
 
     @Override
