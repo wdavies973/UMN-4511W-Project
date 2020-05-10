@@ -14,7 +14,7 @@ public class RandomStrategy implements Strategy {
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
-        ArrayList<SimulatedNode> actions = root.expandAndReturn();
+        ArrayList<SimulatedNode> actions = root.expand();
 
         SimulatedNode n = actions.get(rnd.nextInt(actions.size()));
 

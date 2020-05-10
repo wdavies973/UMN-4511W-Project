@@ -104,14 +104,14 @@ public class SimulatedNode {
         excluded.add(action.piece.getKind());
     }
 
-    public ArrayList<SimulatedNode> expandAndReturn() {
-        expand();
+    public ArrayList<SimulatedNode> expand() {
+        expand(this.grid);
         return children;
     }
 
     // SimulatedNodes are lazily expanded - they are only expanded on demand,
     // this will populate the children with available moves
-    public void expand() {
+    private void expand(Color[][] grid) {
         if(children != null) {
             throw new IllegalCallerException("WARN: Expand should only be called once");
         }
@@ -178,7 +178,7 @@ public class SimulatedNode {
                 return countScores(copy);
             } else {
                 currentNode = childNodes.get(random.nextInt(childNodes.size()));
-                currentNode.expand();
+                currentNode.expand(copy);
             }
         }
     }

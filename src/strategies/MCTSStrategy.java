@@ -57,6 +57,8 @@ public class MCTSStrategy implements Strategy {
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, Grid grid, SimulatedNode root) {
+
+
 //        long start = System.nanoTime();
 //
 //        MNode root = new MNode(null, rootAction);
