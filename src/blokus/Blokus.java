@@ -66,8 +66,6 @@ public class Blokus extends View implements Player.Listener {
         }
 
         if(action != null) {
-            System.out.println("Receiving action from player "+turn);
-
             // applies the action
             grid.move(action);
 

@@ -95,8 +95,6 @@ public class Player extends View {
 
         boolean canStart = nodes.size() > 0;
 
-        System.out.println(id+"has "+nodes.size());
-
         if(canStart) {
             isTurn = true;
             strategy.turnStarted(submissionQueue, SimulatedNode.CREATE_ROOT(grid.cells, players, id));
