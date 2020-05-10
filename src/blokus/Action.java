@@ -40,6 +40,22 @@ public class Action {
         return piece.equals(matrix);
     }
 
+    public int getKind () {
+        return this.piece.getKind();
+    }
+
+    public void setAction(Piece piece, int rotation, boolean flip, int cellX, int cellY) {
+        this.piece = piece;
+        this.rotation = rotation;
+        this.flip = flip;
+        this.cellX = cellX;
+        this.cellY = cellY;
+    }
+
+    public Piece getPiece() {
+        return this.piece;
+    }
+
     @Override
     public String toString() {
         return "Node{" +

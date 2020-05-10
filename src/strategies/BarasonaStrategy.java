@@ -26,37 +26,57 @@ public class BarasonaStrategy implements Strategy {
 
         ArrayList<SimulatedNode> actions = root.expand();
 
-        /*
+        SimulatedNode chosen_Child = actions.get(rnd.nextInt(actions.size()));
+
         if (turn == 1) {
-            submit.add(Action())
-        }
-        */
-
-        SimulatedNode best_child = actions.get(rnd.nextInt(actions.size()));
-        double best = 5000;
-
-        for (int i = 0; i < actions.size(); i++) {
-            double players[] = actions.get(i).getScore();
-            if (players[actions.get(i).getPlayer()] < best) {
-                best_child = actions.get(i);
-                best = players[actions.get(i).getPlayer()];
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.get(i).getAction().getKind() == 8) {
+                    Action otherAction = new Action(actions.get(i).getAction().getPiece(),
+                            2, false, 18, 18);
+                    actions.get(i).setAction(otherAction);
+                    chosen_Child = actions.get(i);
+                }
             }
+
+            submit.add(chosen_Child.getAction());
+        } else if (turn == 2) {
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.get(i).getAction().getKind() == 1) {
+                    Action otherAction = new Action(actions.get(i).getAction().getPiece(),
+                            0, false, 16, 16);
+                    actions.get(i).setAction(otherAction);
+                    chosen_Child = actions.get(i);
+                }
+            }
+
+            submit.add(chosen_Child.getAction());
+        } else if (turn == 3) {
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.get(i).getAction().getKind() == 9) {
+                    Action otherAction = new Action(actions.get(i).getAction().getPiece(),
+                            0, false, 14, 14);
+                    actions.get(i).setAction(otherAction);
+                    chosen_Child = actions.get(i);
+                }
+            }
+
+            submit.add(chosen_Child.getAction());
+        } else if (turn == 4) {
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.get(i).getAction().getKind() == 3) {
+                    Action otherAction = new Action(actions.get(i).getAction().getPiece(),
+                            0, false, 13, 12);
+                    actions.get(i).setAction(otherAction);
+                    chosen_Child = actions.get(i);
+                }
+            }
+
+            submit.add(chosen_Child.getAction());
         }
 
-
-        submit.add(best_child.getAction());
-
-        // play the first 6 moves (6 calls of this method) as barasona
-
-        if(turn > 8) {
-
-            // after
-            //strategy.turnStarted(submit, grid, root);
-        } else {
-            // barsona
+        else {
+            strategy.turnStarted(submit, root);
         }
-
-
 
     }
 

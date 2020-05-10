@@ -340,6 +340,7 @@ public class Piece {
         return moves;
     }
 
+
     public void reset() {
         // Copy the shape
         for(int row = 0; row < 5; row++) {

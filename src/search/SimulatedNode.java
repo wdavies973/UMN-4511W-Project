@@ -4,6 +4,7 @@ package search;
 
 import blokus.Action;
 import blokus.Grid;
+import blokus.Piece;
 import blokus.Player;
 
 import java.awt.*;
@@ -212,6 +213,10 @@ public class SimulatedNode {
         return children;
     }
 
+    public Piece getPiece() {
+        return this.getAction().getPiece();
+    }
+
     public int getPlayer() {return player; };
 
     public double getUCB1() {
@@ -224,6 +229,14 @@ public class SimulatedNode {
 
     public Action getAction() {
         return action;
+    }
+
+    public void setAction(Action otherAction) {
+        this.action = otherAction;
+    }
+
+    public Color[][] getGrid() {
+        return grid;
     }
 
     public static void PRINT_GRID(Color[][] grid) {
