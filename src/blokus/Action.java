@@ -7,8 +7,17 @@ public class Action {
     public boolean flip;
     public int cellX, cellY;
 
+    public boolean human;
+
     private Action() {
 
+    }
+
+    public Action(Piece piece, int cellX, int cellY) {
+        this.piece = piece;
+        this.cellX = cellX;
+        this.cellY = cellY;
+        this.human = true;
     }
 
     public Action(Piece piece, int rotation, boolean flip, int cellX, int cellY) {

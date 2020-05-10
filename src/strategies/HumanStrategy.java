@@ -24,9 +24,9 @@ public class HumanStrategy implements Strategy {
         Point cell = grid.mouseToCell(x, y);
 
         if(submit != null && grid.getInHand() != null) {
-            Action action = new Action(grid.getInHand(), 0, false, cell.x, cell.y);
+            Action action = new Action(grid.getInHand(), cell.x, cell.y);
 
-            if(action.piece.isValid(grid.cells, cell.x, cell.y)) {
+            if(grid.getInHand().isValid(grid.cells, cell.x, cell.y)) {
                 submit.add(action);
             }
         }
