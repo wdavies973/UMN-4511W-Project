@@ -7,13 +7,15 @@ import blokus.Grid;
 import blokus.Player;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 // represents a state as the result of an action being performed
 public class SimulatedNode {
+
+    // exploration / exploitation tradeoff
+    public static final double TRADEOFF = 2;
+    // determines influence of progressive history
+    public static final double W = 5;
 
     private static final Random random = new Random();
 
@@ -94,8 +96,7 @@ public class SimulatedNode {
         }
 
         // APPLY THE ACTION
-        action.piece.apply(false, action.flip, action.rotation);
-        action.piece.place(true, this.grid, action.cellX, action.cellY);
+        action.perform(true, this.grid);
 
         this.action = action;
 
@@ -140,7 +141,6 @@ public class SimulatedNode {
             }
 
         }
-
         return children;
     }
 
@@ -191,7 +191,84 @@ public class SimulatedNode {
         return scores;
     }
 
+    // returns true if none the 4 adjacent (non-diagonal) spots around (col,row)
+    // are set to the specified color
+    private boolean valid(int row, int col, Color color) {
+        if(row - 1 >= 0 && color.equals(grid[row - 1][col])) {
+            return false;
+        } else if(row + 1 < 20 && color.equals(grid[row + 1][col])) {
+            return false;
+        } else if(col - 1 >= 0 && color.equals(grid[row][col - 1])) {
+            return false;
+        } else if(col + 1 < 20 && color.equals(grid[row][col + 1])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // takes the cell in question and checks if any of its 4 diagonal cells
+    // are open, valid, playable cells
+    private int numCornersOpen(int row, int col, Color color) {
+        int corners = 0;
+
+        // top left corner
+        if(row - 1 >= 0 && col - 1 >= 0 && valid(row - 1, col - 1, color)) {
+            corners++;
+        }
+        // top right corner
+        else if(row - 1 >= 0 && col + 1 < 20 && valid(row - 1, col + 1, color)) {
+            corners++;
+        }
+        // bottom left corner
+        else if(row + 1 < 20 && col - 1 >= 0 && valid(row + 1, col - 1, color)) {
+            corners++;
+        }
+        // bottom right corner
+        else if(row + 1 < 20 && col + 1 < 20 && valid(row + 1, col + 1, color)) {
+            corners++;
+        }
+
+        return corners;
+    }
+
+    // finds how many open corners each player has
+    // a corner can be define specifically as such:
+        // a cell that is (+-1, +-1) from another cell of a certain color c
+        // that is not adjacent to any cells of color c (non-diagonally)
+    public double[] getOpenCorners() {
+        double[] scores = new double[players.length];
+
+        for(int row = 0; row < Grid.HEIGHT_CELLS; row++) {
+            for(int col = 0; col < Grid.HEIGHT_CELLS; col++) {
+                if(players[0].getColor().equals(grid[row][col])) {
+                    scores[0] += numCornersOpen(row, col, players[0].getColor());
+                } else if(players[1].getColor().equals(grid[row][col])) {
+                    scores[1] += numCornersOpen(row, col, players[1].getColor());
+                } else if(players[2].getColor().equals(grid[row][col])) {
+                    scores[2] += numCornersOpen(row, col, players[2].getColor());
+                } else if(players[3].getColor().equals(grid[row][col])) {
+                    scores[3] += numCornersOpen(row, col, players[3].getColor());
+                }
+            }
+        }
+
+        return scores;
+    }
+
     public void update(double[] scores) {
+        double max = 0;
+
+        for(double d : scores) {
+            if(d > max) {
+                max = d;
+            }
+        }
+
+        if(scores[this.player] == max) {
+            this.score++;
+        }
+
         this.score += scores[this.player];
         this.visits++;
     }
@@ -201,11 +278,19 @@ public class SimulatedNode {
     }
 
     public double getAverageScore() {
+        if(this.visits == 0) {
+            return 0;
+        }
+
         return this.score / this.visits;
     }
 
     public double[] getScore() {
         return countScores(this.grid);
+    }
+
+    public double getPlayerScore() {
+        return getScore()[player];
     }
 
     public ArrayList<SimulatedNode> getChildren() {
@@ -219,7 +304,25 @@ public class SimulatedNode {
             return Double.MAX_VALUE;
         }
 
-        return (score / visits) + 2 * Math.sqrt(Math.log(parent.visits) / visits);
+        return (score / visits) + TRADEOFF * Math.sqrt(Math.log(parent.visits) / visits);
+    }
+
+    public double getProgressiveBias() {
+        if(visits == 0) {
+            return Double.MAX_VALUE;
+        }
+
+        return getUCB1() + (getPlayerScore() + 0.2 * getOpenCorners()[player]) / (visits + 1);
+    }
+
+    public double getProgressiveHistory(double xa) {
+        if(visits == 0) {
+            return Double.MAX_VALUE;
+        }
+
+        double relativeHistoryScore = W / ((1 - (score / visits)) * visits + 1);
+
+        return getUCB1() + xa * relativeHistoryScore;
     }
 
     public Action getAction() {

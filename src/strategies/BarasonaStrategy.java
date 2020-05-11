@@ -56,9 +56,10 @@ public class BarasonaStrategy implements Strategy {
             // barsona
         }
 
-
-
     }
 
-
+    @Override
+    public String getName() {
+        return "Barasona with "+strategy.getName();
+    }
 }

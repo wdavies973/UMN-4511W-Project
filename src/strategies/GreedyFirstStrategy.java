@@ -32,5 +32,10 @@ public class GreedyFirstStrategy implements Strategy {
 
         submit.add(best_child.getAction());
     }
+
+    @Override
+    public String getName() {
+        return "Greedy";
+    }
 }
 

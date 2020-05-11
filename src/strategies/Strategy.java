@@ -12,4 +12,5 @@ public interface Strategy extends ViewWatcher {
     // simulated action root does not actually have its own "action", it just has children
     void turnStarted(BlockingQueue<Action> submit, SimulatedNode root);
 
+    String getName();
 }
