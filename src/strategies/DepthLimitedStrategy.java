@@ -64,4 +64,9 @@ public class DepthLimitedStrategy implements Strategy{
         }
         return max;
     }
+
+    @Override
+    public String getName() {
+        return "Depth-First";
+    }
 }
