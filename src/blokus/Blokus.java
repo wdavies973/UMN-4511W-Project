@@ -20,10 +20,10 @@ public class Blokus extends View implements Player.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     public final Strategy[] strategies = {
+            new HumanStrategy(grid),
             new MCTSStrategy(),
-            new RandomStrategy(),
-            new RandomStrategy(),
-            new RandomStrategy()
+            new MCTSStrategy(),
+            new MCTSStrategy(),
     };
 
     private final Player bottom = new Player(0, "Red", Color.red, strategies[0], this, Player.Style.Bottom);
@@ -38,11 +38,10 @@ public class Blokus extends View implements Player.Listener {
     private String winner = "";
     private boolean gameOver;
 
-    private HashMap<String, Integer> wins = new HashMap<>();
+    private final HashMap<String, Integer> wins = new HashMap<>();
 
-    // TODO don't forget to random assign strategies to starting positions
-    private boolean equallyDistribute = true;
-    private static final int NUM_GAMES = 100;
+    private static final boolean DISTRIBUTE_STRATEGIES = false;
+    private static final int NUM_GAMES = 1;
     private int gameNum = 0;
 
     private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(1);
@@ -127,7 +126,7 @@ public class Blokus extends View implements Player.Listener {
             System.out.println("-----------------------------------------");
 
             if(gameNum < NUM_GAMES) {
-                if(equallyDistribute) {
+                if(DISTRIBUTE_STRATEGIES) {
                     // Assign strategies
                     int offset = gameNum % (NUM_GAMES / 4); //
 

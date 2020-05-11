@@ -17,8 +17,6 @@ public class RandomStrategy implements Strategy {
 
         SimulatedNode n = actions.get(rnd.nextInt(actions.size()));
 
-        System.out.println(root.getPlayer()+" is playing"+n.getAction());
-
         //System.out.println("playing node"+n.getAction()+" for player "+n.getPlayer()+" actions "+actions.size());
         submit.add(n.getAction());
     }

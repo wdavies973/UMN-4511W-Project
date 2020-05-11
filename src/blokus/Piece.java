@@ -219,6 +219,8 @@ public class Piece {
 
         for(int row = 0; row < 20; row++) {
             for(int col = 0; col < 20; col++) {
+                if(grid[row][col] != null) continue;
+
                 if(isValid(grid, col, row)) {
                     moves.add(new Action(this, rotation, flip, col, row));
                 }
