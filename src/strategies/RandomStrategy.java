@@ -1,7 +1,6 @@
 package strategies;
 
 import blokus.Action;
-import blokus.Grid;
 import search.SimulatedNode;
 
 import java.util.ArrayList;
@@ -22,4 +21,8 @@ public class RandomStrategy implements Strategy {
         submit.add(n.getAction());
     }
 
+    @Override
+    public String getName() {
+        return "Random Strategy";
+    }
 }

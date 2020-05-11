@@ -30,16 +30,12 @@ public class Action {
         this.cellY = cellY;
     }
 
-    public boolean equals(Action move) {
-        if(move.piece.getKind() != piece.getKind()) {
-            return false;
-        }
+    public boolean perform(boolean simulated, Color[][] grid) {
+        if(!human) piece.setLayout(flip, rotation);
+        boolean result = piece.place(simulated, grid, cellX, cellY);
+        if(!human) piece.reset();
 
-        // In this case, each piece is a reference to the same object, so use apply
-        // to return the affect matrix
-        int[][] matrix = move.piece.apply(true, flip, rotation);
-
-        return piece.equals(matrix);
+        return result;
     }
 
     public int getKind () {

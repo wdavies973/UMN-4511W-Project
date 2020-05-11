@@ -22,7 +22,8 @@ public class Piece {
     // the corner the piece must start at
     private int cornerX, cornerY;
 
-    private AllPieces pieceInst = new AllPieces();
+    private boolean flipped;
+    private int rotation;
 
     // this should setup what kind of piece this should be, you should come up with some sort of a system
     // that will assign the values in "shape" correctly. So for example, there are 21 pieces, so I should be able
@@ -33,70 +34,32 @@ public class Piece {
         this.cornerY = cornerY;
         this.color = color;
         this.kind = kind;
+        this.flipped = false;
+        this.rotation = 0;
 
-        shape = pieceInst.piece_type(kind);
+        shape = PieceList.GET_PIECE(kind, false, 0);
 
         // Copy the shape
-        shapeCopy = pieceInst.piece_type(kind);
-
-    }
-
-    // returns an arraylist containing every possible piece kind, just a convenience method,
-    // return them from largest to smallest size
-    public static ArrayList<Piece> CREATE_ALL_PIECES(Color color) {
-        return new ArrayList<>();
+        shapeCopy =  PieceList.GET_PIECE(kind, false, 0);
     }
 
     // perform a matrix rotate transform on the "shape" 2D array
     public void rotateClockwise() {
-        int[][] flipped = new int[5][5];
-
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                flipped[x][4 - y] = shape[y][x];
-                //flipped[y][x] = shape[x][4 - y];
-            }
-        }
-
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                shape[y][x] = flipped[y][x];
-            }
-        }
-    }
-
-    // perform a matrix rotate transform on the "shape" 2D array
-    public void rotateCounterClockwise() {
-        int[][] flipped = new int[5][5];
-
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                flipped[y][x] = shape[x][4 - y];
-            }
-        }
-
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                shape[y][x] = flipped[y][x];
-            }
-        }
+        this.rotation = (this.rotation + 1) % 4;
+        shape = PieceList.GET_PIECE(kind, flipped, this.rotation);
     }
 
     // flips the x-coordinates of the given piece
     public void flip() {
-        int[][] flipped = new int[5][5];
+        this.flipped = !flipped;
+        shape = PieceList.GET_PIECE(kind, flipped, this.rotation);
+    }
 
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                flipped[y][4 - x] = shape[y][x];
-            }
-        }
+    public void setLayout(boolean flipped, int rotation) {
+        this.flipped = flipped;
+        this.rotation = rotation;
 
-        for(int y = 0; y < 5; y++) {
-            for(int x = 0; x < 5; x++) {
-                shape[y][x] = flipped[y][x];
-            }
-        }
+        shape = PieceList.GET_PIECE(kind, flipped, rotation);
     }
 
     // determines if the current piece is in a corner
@@ -113,8 +76,6 @@ public class Piece {
         }
         return cornered;
     }
-
-
 
     // returns whether the following placement of the piece is valid,
     // you'll need to access the grid.cells attribute to inspect cells,
@@ -201,19 +162,6 @@ public class Piece {
         return true;
     }
 
-    // is there any valid location to put the piece? hint: use
-    // isValid on every cell
-    public boolean anyValid(Color[][] grid) {
-        for(int y = 0; y < 20; y++) {
-            for(int x = 0; x < 20; x++) {
-                if(isValid(grid, x, y)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     // Places the piece at position x,y on the map, the piece should be centered
     // at this location (i.e. shape[1][1] should correspond to x,y). Use the color
     // attribute of this class to set the grid position. This method should check
@@ -266,37 +214,13 @@ public class Piece {
         return kind;
     }
 
-    public int[][] apply(boolean copy, boolean flip, int rotation) {
-        reset();
-
-        if(flip) {
-            flip();
-        }
-
-        for(int i = 0; i < rotation; i++) {
-            rotateClockwise();
-        }
-
-        if(!copy) {
-            return shape;
-        } else {
-            int[][] applied = new int[5][5];
-
-            // Copy the shape
-            for(int row = 0; row < shape.length; row++) {
-                System.arraycopy(applied[row], 0, shape[row], 0, applied[row].length);
-            }
-
-            reset();
-
-            return applied;
-        }
-
-    }
-
     private void addMoves(ArrayList<Action> moves, Color[][] grid, boolean flip, int rotation) {
+        setLayout(flip, rotation);
+
         for(int row = 0; row < 20; row++) {
             for(int col = 0; col < 20; col++) {
+                if(grid[row][col] != null) continue;
+
                 if(isValid(grid, col, row)) {
                     moves.add(new Action(this, rotation, flip, col, row));
                 }
@@ -307,45 +231,28 @@ public class Piece {
     public ArrayList<Action> getPossibleMoves(Color[][] grid) {
         ArrayList<Action> moves = new ArrayList<>();
 
-        reset();
+        boolean flip = this.flipped;
+        int rot = this.rotation;
 
-        for(int i = 0; i < 4; i++) {
-            addMoves(moves, grid, false, i);
-            rotateClockwise();
-        }
-
-        reset();
-        flip();
-
-        for(int i = 0; i < 4; i++) {
-            addMoves(moves, grid, true, i);
-            rotateClockwise();
-        }
-
-        reset();
-
-        // remove duplicates
-        for(int i = 0; i < moves.size(); i++) {
-            for(int j = 0; j < moves.size(); j++) {
-                if(i == j) continue;
-
-                if(moves.get(i).equals(moves.get(j))) {
-                    moves.remove(j);
-                    i = 0;
-                    j = 0;
-                }
+        for(PieceList.Layout l : PieceList.UNIQUE_LAYOUTS) {
+            if(l.pieceId != kind) {
+                continue;
             }
+
+            addMoves(moves, grid, l.flipped, l.rotation);
         }
+
+        setLayout(flip, rot);
 
         return moves;
     }
 
 
     public void reset() {
-        // Copy the shape
-        for(int row = 0; row < 5; row++) {
-            System.arraycopy(shapeCopy[row], 0, shape[row], 0, 5);
-        }
+        this.flipped = false;
+        this.rotation = 0;
+
+        shape = PieceList.GET_PIECE(kind, false, rotation);
     }
 
     // ignore below here

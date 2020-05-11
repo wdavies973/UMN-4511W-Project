@@ -104,11 +104,7 @@ public class Grid extends View {
     }
 
     void move(Action action) {
-        if(!action.human) {
-            action.piece.apply(false, action.flip, action.rotation);
-        }
-
-        if(!action.piece.place(false, cells, action.cellX, action.cellY)) {
+        if(!action.perform(false, cells)) {
             System.out.println("Action rejected");
         }
     }
