@@ -125,6 +125,22 @@ public class Player extends View {
         return moves;
     }
 
+    public ArrayList<Action> getOnePieceActions(Color[][] grid, HashSet<Integer> exclude, int kind) {
+        ArrayList<Action> moves = new ArrayList<>();
+
+        for(Piece piece : pieces) {
+            if (piece.getKind() == kind) {
+                if(piece.isPlaced() || exclude.contains(piece.getKind())) continue;
+
+            }
+            if(piece.isPlaced() || exclude.contains(piece.getKind())) continue;
+
+            moves.addAll(piece.getPossibleMoves(grid));
+        }
+
+        return moves;
+    }
+
     public void draw(Graphics2D g, int x, int y, int width, int height) {
         if(style == Style.Top || style == Style.Bottom) {
             int pieceHeight = height / 3;

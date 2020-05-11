@@ -14,52 +14,119 @@ public class BarasonaStrategy implements Strategy {
 
     private int turn = 0;
     private final Random rnd = new Random();
+    private final int id;
 
-    public BarasonaStrategy(Strategy strategy) {
-
+    public BarasonaStrategy(int id, Strategy strategy) {
+        this.id = id;
         this.strategy = strategy;
     }
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         turn++;
-
         ArrayList<SimulatedNode> actions = root.expand();
 
-        /*
-        if (turn == 1) {
-            submit.add(Action())
-        }
-        */
+        SimulatedNode chosen_Child = actions.get(rnd.nextInt(actions.size()));
 
-        SimulatedNode best_child = actions.get(rnd.nextInt(actions.size()));
-        double best = 5000;
+            if (turn == 1) {
+                for (int i = 0; i < actions.size(); i++) {
+                    if (actions.get(i).getAction().getKind() == 8) {
+                        Action otherAction;
+                        if (id == 0) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    2, false, 18, 18);
+                        } else if (id == 1) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    1, false, 18, 1);
+                        } else if (id == 2) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 1, 1);
+                        } else {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    3, false, 1, 18);
+                        }
+                        actions.get(i).setAction(otherAction);
+                        chosen_Child = actions.get(i);
+                        break;
+                    }
+                }
 
-        for (int i = 0; i < actions.size(); i++) {
-            double players[] = actions.get(i).getScore();
-            if (players[actions.get(i).getPlayer()] < best) {
-                best_child = actions.get(i);
-                best = players[actions.get(i).getPlayer()];
+                submit.add(chosen_Child.getAction());
+            } else if (turn == 2) {
+                for (int i = 0; i < actions.size(); i++) {
+                    if (actions.get(i).getAction().getKind() == 1) {
+                        Action otherAction;
+                        if (id == 0) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 16, 16);
+                        } else if (id == 1) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 16, 3);
+                        } else if (id == 2) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 3, 3);
+                        } else {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 3, 16);
+                        }
+                        actions.get(i).setAction(otherAction);
+                        chosen_Child = actions.get(i);
+                        break;
+                    }
+                }
+
+                submit.add(chosen_Child.getAction());
+            } else if (turn == 3) {
+                for (int i = 0; i < actions.size(); i++) {
+                    if (actions.get(i).getAction().getKind() == 9) {
+                        Action otherAction;
+                        if (id == 0) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 14, 14);
+                        } else if (id == 1) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    3, false, 14, 5);
+                        } else if (id == 2) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    2, false, 5, 5);
+                        } else {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    1, false, 5, 14);
+                        }
+                        actions.get(i).setAction(otherAction);
+                        chosen_Child = actions.get(i);
+                        break;
+                    }
+                }
+
+                submit.add(chosen_Child.getAction());
+            } else if (turn == 4) {
+                for (int i = 0; i < actions.size(); i++) {
+                    if (actions.get(i).getAction().getKind() == 3) {
+                        Action otherAction;
+                        if (id == 0) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    0, false, 13, 12);
+                        } else if (id == 1) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    3, false, 12, 6);
+                        } else if (id == 2) {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    2, false, 6, 7);
+                        } else {
+                            otherAction = new Action(actions.get(i).getAction().getPiece(),
+                                    1, false, 7, 13);
+                        }
+                            actions.get(i).setAction(otherAction);
+                            chosen_Child = actions.get(i);
+                            break;
+                    }
+                }
+
+                submit.add(chosen_Child.getAction());
+            } else {
+                strategy.turnStarted(submit, root);
             }
         }
-
-
-        submit.add(best_child.getAction());
-
-        // play the first 6 moves (6 calls of this method) as barasona
-
-        if(turn > 8) {
-
-            // after
-            //strategy.turnStarted(submit, grid, root);
-        } else {
-            // barsona
-        }
-
     }
 
-    @Override
-    public String getName() {
-        return "Barasona with "+strategy.getName();
-    }
-}

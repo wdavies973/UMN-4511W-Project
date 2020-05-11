@@ -247,6 +247,7 @@ public class Piece {
         return moves;
     }
 
+
     public void reset() {
         this.flipped = false;
         this.rotation = 0;
