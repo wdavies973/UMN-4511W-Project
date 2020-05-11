@@ -58,4 +58,9 @@ public class HumanStrategy implements Strategy {
             }
         }
     }
+
+    @Override
+    public String getName() {
+        return "Human";
+    }
 }

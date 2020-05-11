@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="UMN-4511W-Project:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/UMN_4511W_Project_jar</output-path>
+    <root id="archive" name="UMN-4511W-Project.jar">
+      <element id="module-output" name="UMN-4511W-Project" />
+    </root>
+  </artifact>
+</component>

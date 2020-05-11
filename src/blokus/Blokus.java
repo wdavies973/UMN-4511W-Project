@@ -1,15 +1,13 @@
 package blokus;
 
 import engine.View;
-import strategies.GreedyFirstStrategy;
-import strategies.HumanStrategy;
-import strategies.MCTSStrategy;
-import strategies.RandomStrategy;
+import strategies.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 
 // controls the overall game and state
 public class Blokus extends View implements Player.Listener {
@@ -21,10 +19,17 @@ public class Blokus extends View implements Player.Listener {
 
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
-    private final Player bottom = new Player(0, "Player 2", Color.red, new MCTSStrategy(), this, Player.Style.Bottom);
-    private final Player right = new Player(1,"Player 4", Color.yellow, new GreedyFirstStrategy(),this, Player.Style.Right);
-    private final Player top = new Player(2,"Player 1", Color.blue, new RandomStrategy(), this, Player.Style.Top);
-    private final Player left = new Player(3,"Player 3", BETTER_GREEN, new RandomStrategy(),this,  Player.Style.Left);
+    public final Strategy[] strategies = {
+            new MCTSStrategy(),
+            new RandomStrategy(),
+            new RandomStrategy(),
+            new RandomStrategy()
+    };
+
+    private final Player bottom = new Player(0, "Red", Color.red, strategies[0], this, Player.Style.Bottom);
+    private final Player right = new Player(1,"Yellow", Color.yellow, strategies[1],this, Player.Style.Right);
+    private final Player top = new Player(2,"Blue", Color.blue, strategies[2], this, Player.Style.Top);
+    private final Player left = new Player(3,"Green", BETTER_GREEN, strategies[3],this,  Player.Style.Left);
 
     private final Player[] players = new Player[]{bottom, right, top, left};
 
@@ -33,11 +38,14 @@ public class Blokus extends View implements Player.Listener {
     private String winner = "";
     private boolean gameOver;
 
+    private HashMap<String, Integer> wins = new HashMap<>();
+
     // TODO don't forget to random assign strategies to starting positions
-    private static final int NUM_GAMES = 1;
+    private boolean equallyDistribute = true;
+    private static final int NUM_GAMES = 100;
     private int gameNum = 0;
 
-    private static ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(1);
 
     public Blokus() {
         addChildren(grid, top, bottom, left, right);
@@ -47,13 +55,11 @@ public class Blokus extends View implements Player.Listener {
     }
 
     public void beginGame() {
-        // bottom player starts
         bottom.setTurn(true);
         grid.setActiveWatcher(0);
         bottom.startTurn(queue, players, grid);
     }
 
-    @Override
     public void update() {
         if(gameOver) return;
 
@@ -104,22 +110,35 @@ public class Blokus extends View implements Player.Listener {
             this.gameOver = true;
             if(winner != null) {
                 this.winner = winner.getName();
-                winner.wins++;
+                int amount = wins.getOrDefault(winner.getStrategy().getName(), 0);
+                wins.put(winner.getStrategy().getName(), amount + 1);
+
             }
 
             gameNum++;
 
             System.out.println("Game "+gameNum+" / "+NUM_GAMES+" finished");
 
+            System.out.println("---------------- RESULTS ----------------");
+            // Print results
+            for(String name : wins.keySet()) {
+                System.out.println(name+" wins = "+wins.get(name));
+            }
+            System.out.println("-----------------------------------------");
+
             if(gameNum < NUM_GAMES) {
-                reset();
-            } else {
-                System.out.println("---------------- RESULTS ----------------");
-                // Print results
-                for(Player p : players) {
-                    System.out.println(p);
+                if(equallyDistribute) {
+                    // Assign strategies
+                    int offset = gameNum % (NUM_GAMES / 4); //
+
+                    for(int i = 0; i < players.length; i++) {
+                        players[(offset + i ) % players.length].setStrategy(strategies[i]);
+
+                        System.out.println("Player "+((offset + i) % players.length)+" assigned strategy "+i);
+                    }
                 }
-                System.out.println("-----------------------------------------");
+
+                reset();
             }
         }
     }
@@ -146,7 +165,6 @@ public class Blokus extends View implements Player.Listener {
             g.drawString("F12 to restart", x + 15, y + height - 15);
 
         }
-
     }
 
     @Override
@@ -200,11 +218,7 @@ public class Blokus extends View implements Player.Listener {
 
         if(key.getKeyCode() == KeyEvent.VK_F12) {
             gameNum = 0;
-            for(Player p : players) {
-                p.wins = 0;
-            }
-
-            reset();
+            wins.clear();
         }
     }
 }

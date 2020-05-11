@@ -33,15 +33,13 @@ public class Player extends View {
 
     private boolean isTurn;
 
-    private final Strategy strategy;
+    private Strategy strategy;
 
     private final Color turnHighlight = Color.green;
 
     private final BasicStroke basicStroke = new BasicStroke(5);
 
     private boolean outOfMoves;
-
-    public int wins; // keeps track of wins for benchmarking purposes
 
     private final int id; // 0-3, starting at bottom and going counter-clockwise
 
@@ -278,16 +276,11 @@ public class Player extends View {
     }
 
 
-
-    @Override
-    public String toString() {
-        return "Player{" +
-                "name='" + name + '\'' +
-                ", wins=" + wins +
-                '}';
-    }
-
     public Color getColor() {
         return color;
+    }
+
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
     }
 }

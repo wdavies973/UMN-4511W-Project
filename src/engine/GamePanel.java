@@ -17,7 +17,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     private static final long TARGET_TIME = 1000 / 144; // denominator is FPS you want the game to run at
     private volatile boolean running;
 
-    private final Blokus blokus;
+    private Blokus blokus;
+    private boolean updateThreadRunning;
 
     public GamePanel(int width, int height) {
         this.width = width;
@@ -63,11 +64,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void run() {
         init();
 
+        updateThreadRunning = true;
+
         // Start update thread
         new Thread(() -> {
             blokus.beginGame();
 
-            while(true) {
+            while(updateThreadRunning) {
                 blokus.update();
             }
         }).start();
@@ -163,4 +166,5 @@ public class GamePanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void mouseMoved(MouseEvent e) {
         blokus.mouseMoved(e.getX(), e.getY());
     }
+
 }

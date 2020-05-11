@@ -1,7 +1,6 @@
 package strategies;
 
 import blokus.Action;
-import blokus.Grid;
 import search.SimulatedNode;
 
 import java.util.concurrent.BlockingQueue;
@@ -29,8 +28,10 @@ import java.util.concurrent.BlockingQueue;
 
 public class MCTSStrategy implements Strategy {
 
+    long id = System.nanoTime();
+
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_MS = 500;
+    private static final int COMPUTE_TIME_MS = 1000;
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
@@ -46,15 +47,24 @@ public class MCTSStrategy implements Strategy {
         double maxScore = Double.MIN_VALUE;
         SimulatedNode bestChild = null;
 
+        int inded =  0;
+
         for(SimulatedNode child : root.getChildren()) {
+            if(child.getVisits() == 0) {
+                System.out.println(inded+" / "+root.getChildren().size()+" were expanded");
+                break;
+            }
+
             if(child.getAverageScore() > maxScore) {
                 maxScore = child.getAverageScore();
                 bestChild = child;
             }
+
+            inded++;
         }
 
-        if(bestChild  == null) {
-            throw new IllegalStateException("An error occurred");
+        if(bestChild == null) {
+            throw new IllegalStateException("An error occurred"+root.getChildren().size());
         }
 
         submit.add(bestChild.getAction());
@@ -80,8 +90,12 @@ public class MCTSStrategy implements Strategy {
         double[] result;
 
         if(bestChild.getVisits() == 0) {
+            long s = System.nanoTime();
             bestChild.expand();
+            //System.out.println("Took "+(System.nanoTime() - s)+" ns to expand");
+            //s = System.nanoTime();
             result = bestChild.playout();
+            //System.out.println("Took "+(System.nanoTime() - s)+" ns to playout");
         } else {
             result = MCTS(bestChild);
         }
@@ -89,4 +103,8 @@ public class MCTSStrategy implements Strategy {
         return result;
     }
 
+    @Override
+    public String getName() {
+        return "Vanilla MCTS"+id;
+    }
 }
