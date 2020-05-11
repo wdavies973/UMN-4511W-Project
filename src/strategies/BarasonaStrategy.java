@@ -128,5 +128,10 @@ public class BarasonaStrategy implements Strategy {
                 strategy.turnStarted(submit, root);
             }
         }
+
+    @Override
+    public String getName() {
+        return "Barasona Strategy";
+    }
     }
 
