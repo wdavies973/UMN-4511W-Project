@@ -22,8 +22,8 @@ public class Blokus extends View implements Player.Listener {
     public final Strategy[] strategies = {
             new HumanStrategy(grid),
             new PH_MCTSStrategy(),
-            new BarasonaStrategy(new PH_MCTSStrategy()),
-            new BarasonaStrategy(new PH_MCTSStrategy())
+            new BarasonaStrategy(2, new PH_MCTSStrategy()),
+            new BarasonaStrategy(3, new MCTSStrategy())
     };
 
     private final Player bottom = new Player(0, "Red", Color.red, strategies[0], this, Player.Style.Bottom);

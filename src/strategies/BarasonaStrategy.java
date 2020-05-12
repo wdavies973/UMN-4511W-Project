@@ -15,14 +15,15 @@ public class BarasonaStrategy implements Strategy {
     private int turn = 0;
     private final Random rnd = new Random();
 
-    public BarasonaStrategy(Strategy strategy) {
+    private int id;
+
+    public BarasonaStrategy(int player, Strategy strategy) {
+        this.id = player;
         this.strategy = strategy;
     }
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
-        int id = root.getPlayer();
-
         turn++;
         ArrayList<SimulatedNode> actions = root.expand();
 
