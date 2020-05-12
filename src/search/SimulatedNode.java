@@ -14,7 +14,7 @@ import java.util.*;
 public class SimulatedNode {
 
     // exploration / exploitation tradeoff
-    public static final double TRADEOFF = 2;
+    public static final double TRADEOFF = .2;
     // determines influence of progressive history
     public static final double W = 5;
 
@@ -154,7 +154,7 @@ public class SimulatedNode {
      */
     public double[] playout() {
         if(children == null) {
-            throw new IllegalCallerException("Please call expand() before calling playout()");
+            //throw new IllegalCallerException("Please call expand() before calling playout()");
         }
 
         SimulatedNode currentNode = this;
@@ -258,18 +258,6 @@ public class SimulatedNode {
     }
 
     public void update(double[] scores) {
-        double max = 0;
-
-        for(double d : scores) {
-            if(d > max) {
-                max = d;
-            }
-        }
-
-        if(scores[this.player] == max) {
-            this.score++;
-        }
-
         this.score += scores[this.player];
         this.visits++;
     }
@@ -317,7 +305,7 @@ public class SimulatedNode {
             return Double.MAX_VALUE;
         }
 
-        return getUCB1() + (getPlayerScore() + 0.2 * getOpenCorners()[player]) / (visits + 1);
+        return getUCB1() + (getPlayerScore() + 0.2 * children.size()) / (visits + 1);
     }
 
     public double getProgressiveHistory(double xa) {

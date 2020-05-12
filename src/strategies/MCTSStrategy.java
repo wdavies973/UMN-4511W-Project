@@ -31,7 +31,7 @@ public class MCTSStrategy implements Strategy {
     long id = System.nanoTime();
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_MS = 6000;
+    private static final int COMPUTE_TIME_MS = 8000;
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
@@ -51,7 +51,7 @@ public class MCTSStrategy implements Strategy {
 
         for(SimulatedNode child : root.getChildren()) {
             if(child.getVisits() == 0) {
-                System.out.println(inded+" / "+root.getChildren().size()+" were expanded");
+                //System.out.println(inded+" / "+root.getChildren().size()+" were expanded");
                 break;
             }
 
