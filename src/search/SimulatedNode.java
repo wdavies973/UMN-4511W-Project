@@ -14,7 +14,7 @@ import java.util.*;
 public class SimulatedNode {
 
     // exploration / exploitation tradeoff
-    public static final double TRADEOFF = 2;
+    public static final double TRADEOFF = 0.2;
     // determines influence of progressive history
     public static final double W = 5;
 

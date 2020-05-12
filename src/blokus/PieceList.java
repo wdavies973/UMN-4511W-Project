@@ -221,8 +221,6 @@ public class PieceList {
             }
         }
 
-        int c = 0;
-
         // Remove duplicates
 //        for(int i = 0; i < 21; i++) {
 //            for(int j = 0; j < 21; j++) {
@@ -318,6 +316,4 @@ public class PieceList {
         }
         return out;
     }
-
-
 }

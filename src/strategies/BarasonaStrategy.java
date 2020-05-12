@@ -14,16 +14,16 @@ public class BarasonaStrategy implements Strategy {
 
     private int turn = 0;
     private final Random rnd = new Random();
-    private final int id;
 
-    public BarasonaStrategy(int id, Strategy strategy) {
-        this.id = id;
+    public BarasonaStrategy(Strategy strategy) {
         this.strategy = strategy;
     }
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
         turn++;
+        int id = root.getPlayer();
+
         ArrayList<SimulatedNode> actions = root.expand();
 
         SimulatedNode chosen_Child = actions.get(rnd.nextInt(actions.size()));
@@ -33,6 +33,7 @@ public class BarasonaStrategy implements Strategy {
                     if (actions.get(i).getAction().getKind() == 8) {
                         Action otherAction;
                         if (id == 0) {
+                            System.out.println(id + " " + id);
                             otherAction = new Action(actions.get(i).getAction().getPiece(),
                                     2, false, 18, 18);
                         } else if (id == 1) {
@@ -131,7 +132,7 @@ public class BarasonaStrategy implements Strategy {
 
     @Override
     public String getName() {
-        return "Barasona Strategy";
+        return "Barasona";
     }
-    }
+}
 

@@ -31,7 +31,7 @@ public class MCTSStrategy implements Strategy {
     long id = System.nanoTime();
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_MS = 6000;
+    private static final int COMPUTE_TIME_MS = 1000;
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {

@@ -20,10 +20,15 @@ public class Blokus extends View implements Player.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     public final Strategy[] strategies = {
-            new HumanStrategy(grid),
-            new MCTSStrategy(),
-            new MCTSStrategy(),
-            new MCTSStrategy(),
+            //new HumanStrategy(grid),
+            new BarasonaStrategy(new MCTSStrategy()),
+            new BarasonaStrategy(new PH_MCTSStrategy()),
+            new BarasonaStrategy(new PB_MCTSStrategy()),
+            new BarasonaStrategy(new DepthLimitedStrategy()),
+            //new PB_MCTSStrategy(),
+            // new BarasonaStrategy(1, new MCTSStrategy()),
+           // new MCTSStrategy(),
+           // new BarasonaStrategy(3, new MCTSStrategy()),
     };
 
     private final Player bottom = new Player(0, "Red", Color.red, strategies[0], this, Player.Style.Bottom);
@@ -40,8 +45,8 @@ public class Blokus extends View implements Player.Listener {
 
     private final HashMap<String, Integer> wins = new HashMap<>();
 
-    private static final boolean DISTRIBUTE_STRATEGIES = false;
-    private static final int NUM_GAMES = 1;
+    private static final boolean DISTRIBUTE_STRATEGIES = true; //set back to true
+    private static final int NUM_GAMES = 100; // set back to 100
     private int gameNum = 0;
 
     private final ArrayBlockingQueue<Action> queue = new ArrayBlockingQueue<>(1);

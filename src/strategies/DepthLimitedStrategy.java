@@ -67,6 +67,6 @@ public class DepthLimitedStrategy implements Strategy{
 
     @Override
     public String getName() {
-        return "Depth Limited";
+        return "Depth-First";
     }
 }
