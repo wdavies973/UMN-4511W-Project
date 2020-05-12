@@ -1,6 +1,6 @@
 # UMN-4511W-Project
 
-# Installation instructions
+# Installation
 
 - Make sure to install [Java](https://www.java.com/en/)
 
