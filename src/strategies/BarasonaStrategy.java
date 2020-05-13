@@ -15,7 +15,10 @@ public class BarasonaStrategy implements Strategy {
     private int turn = 0;
     private final Random rnd = new Random();
 
-    public BarasonaStrategy(Strategy strategy) {
+    private int id;
+
+    public BarasonaStrategy(int player, Strategy strategy) {
+        this.id = player;
         this.strategy = strategy;
     }
 

@@ -68,17 +68,10 @@ public class PH_MCTSStrategy implements Strategy {
         }
     }
 
-    private static final HashMap<Integer, ArrayList<ActionInfo>> HISTORY = new HashMap<>();
-
-    static {
-        HISTORY.put(0, new ArrayList<>());
-        HISTORY.put(1, new ArrayList<>());
-        HISTORY.put(2, new ArrayList<>());
-        HISTORY.put(3, new ArrayList<>());
-    }
+    private final HashMap<Integer, ArrayList<ActionInfo>> HISTORY = new HashMap<>();
 
     // the number of seconds the strategy is allowed to work for
-    private static final int COMPUTE_TIME_MS = 500;
+    private static final int COMPUTE_TIME_MS = 8000;
 
     private double getProgressiveHistoryForPlayer(int player, Action action) {
         ArrayList<ActionInfo> playerHistory = HISTORY.get(player);
@@ -93,6 +86,13 @@ public class PH_MCTSStrategy implements Strategy {
 
     @Override
     public void turnStarted(BlockingQueue<Action> submit, SimulatedNode root) {
+        HISTORY.clear();
+
+        HISTORY.put(0, new ArrayList<>());
+        HISTORY.put(1, new ArrayList<>());
+        HISTORY.put(2, new ArrayList<>());
+        HISTORY.put(3, new ArrayList<>());
+
         long start = System.nanoTime();
 
         root.expand();

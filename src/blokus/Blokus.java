@@ -20,15 +20,10 @@ public class Blokus extends View implements Player.Listener {
     private static final Color BETTER_GREEN = new Color(0, 100, 0);
 
     public final Strategy[] strategies = {
-            //new HumanStrategy(grid),
-            new BarasonaStrategy(new MCTSStrategy()),
-            new BarasonaStrategy(new PH_MCTSStrategy()),
-            new BarasonaStrategy(new PB_MCTSStrategy()),
-            new BarasonaStrategy(new DepthLimitedStrategy()),
-            //new PB_MCTSStrategy(),
-            // new BarasonaStrategy(1, new MCTSStrategy()),
-           // new MCTSStrategy(),
-           // new BarasonaStrategy(3, new MCTSStrategy()),
+            new HumanStrategy(grid),
+            new PH_MCTSStrategy(),
+            new BarasonaStrategy(2, new PH_MCTSStrategy()),
+            new BarasonaStrategy(3, new MCTSStrategy())
     };
 
     private final Player bottom = new Player(0, "Red", Color.red, strategies[0], this, Player.Style.Bottom);
@@ -165,9 +160,7 @@ public class Blokus extends View implements Player.Listener {
 
         g.setColor(Color.black);
         if(gameOver) {
-            g.drawString("GAME OVER - "+winner+" wins!", x + 15, y + height - 15 - g.getFontMetrics().getHeight());
-            g.drawString("F12 to restart", x + 15, y + height - 15);
-
+            g.drawString("GAME OVER - "+winner+" wins!", x + 15, y + height - 15);
         }
     }
 
